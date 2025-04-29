@@ -1,10 +1,11 @@
-<!-- index.html -->
+<!-- index.html – alles in EINER Datei: Manifest, Service-Worker, komplette Wort- und Übersetzungslisten -->
 <!DOCTYPE html>
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Der Die Das Trainer</title>
+
 <style>
 :root{
  --background-color:#fff;
@@ -66,123 +67,150 @@ footer{text-align:center;margin-top:40px;padding:20px;font-size:.8rem;color:#aaa
 <footer>Der Die Das Trainer – übe deutsche Artikel</footer>
 
 <script>
-/* ====================== Wortlisten (≈450) ====================== */
+/* ================= 0. Manifest & Service-Worker inline ================ */
+(()=>{
+  const icon="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAF0lEQVR42mNgGP7/PwMDAwMjI2BgYAAAAAIAAAGhDQvTAAAAABJRU5ErkJggg==";
+  const manifest={
+    name:"Der Die Das Trainer",
+    short_name:"DDD Trainer",
+    start_url:".",
+    display:"standalone",
+    background_color:"#ffffff",
+    theme_color:"#ffffff",
+    icons:[{src:icon,sizes:"192x192",type:"image/png"},
+           {src:icon,sizes:"512x512",type:"image/png"}]
+  };
+  const manifestURL=URL.createObjectURL(new Blob([JSON.stringify(manifest)],{type:"application/json"}));
+  const link=document.createElement("link");link.rel="manifest";link.href=manifestURL;document.head.appendChild(link);
+
+  if("serviceWorker" in navigator){
+    const sw=`
+      const CACHE="ddd-cache-v1";
+      self.addEventListener("install",e=>{
+        e.waitUntil(caches.open(CACHE).then(c=>c.addAll(["./"])));
+        self.skipWaiting();
+      });
+      self.addEventListener("activate",e=>{
+        e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));
+        self.clients.claim();
+      });
+      self.addEventListener("fetch",e=>{
+        e.respondWith(caches.match(e.request,{ignoreSearch:true}).then(r=>r||fetch(e.request)));
+      });
+      self.addEventListener("push",e=>{
+        const d=e.data?e.data.json():{title:"Trainer",body:"Zeit zum Üben!"};
+        self.registration.showNotification(d.title,{body:d.body,icon:"${icon}"});
+      });
+    `;
+    const swURL=URL.createObjectURL(new Blob([sw],{type:"application/javascript"}));
+    navigator.serviceWorker.register(swURL);
+  }
+  if("Notification" in window && Notification.permission==="default"){Notification.requestPermission();}
+})();
+
+/* ================= 1. Wortliste (≈450 Grundwörter) =================== */
 const germanNouns=[
- /* --- der --- */
- {w:"Mann",a:"der"},{w:"Junge",a:"der"},{w:"Vater",a:"der"},{w:"Bruder",a:"der"},{w:"Sohn",a:"der"},
- {w:"Großvater",a:"der"},{w:"Onkel",a:"der"},{w:"Arzt",a:"der"},{w:"Lehrer",a:"der"},{w:"Student",a:"der"},
- {w:"Freund",a:"der"},{w:"Nachbar",a:"der"},{w:"Kellner",a:"der"},{w:"Polizist",a:"der"},{w:"Ingenieur",a:"der"},
- {w:"Tisch",a:"der"},{w:"Stuhl",a:"der"},{w:"Schrank",a:"der"},{w:"Sessel",a:"der"},{w:"Teppich",a:"der"},
- {w:"Computer",a:"der"},{w:"Bildschirm",a:"der"},{w:"Drucker",a:"der"},{w:"Kühlschrank",a:"der"},{w:"Herd",a:"der"},
- {w:"Ofen",a:"der"},{w:"Löffel",a:"der"},{w:"Teller",a:"der"},{w:"Kamm",a:"der"},{w:"Spiegel",a:"der"},
- {w:"Hund",a:"der"},{w:"Vogel",a:"der"},{w:"Fisch",a:"der"},{w:"Tiger",a:"der"},{w:"Elefant",a:"der"},
- {w:"Baum",a:"der"},{w:"Fluss",a:"der"},{w:"Berg",a:"der"},{w:"See",a:"der"},{w:"Wald",a:"der"},
- {w:"Tag",a:"der"},{w:"Abend",a:"der"},{w:"Morgen",a:"der"},{w:"Winter",a:"der"},{w:"Sommer",a:"der"},
- {w:"Frühling",a:"der"},{w:"Herbst",a:"der"},{w:"Regen",a:"der"},{w:"Schnee",a:"der"},{w:"Wind",a:"der"},
- {w:"Arm",a:"der"},{w:"Fuß",a:"der"},{w:"Kopf",a:"der"},{w:"Mund",a:"der"},{w:"Finger",a:"der"},
- {w:"Zahn",a:"der"},{w:"Rücken",a:"der"},{w:"Bauch",a:"der"},{w:"Durst",a:"der"},{w:"Hunger",a:"der"},
- {w:"Stift",a:"der"},{w:"Bleistift",a:"der"},{w:"Kugelschreiber",a:"der"},{w:"Radiergummi",a:"der"},{w:"Ordner",a:"der"},
- {w:"Kalender",a:"der"},{w:"Brief",a:"der"},{w:"Zug",a:"der"},{w:"Bus",a:"der"},{w:"LKW",a:"der"},
- {w:"Bahnhof",a:"der"},{w:"Flughafen",a:"der"},{w:"Markt",a:"der"},{w:"Preis",a:"der"},{w:"Euro",a:"der"},
- {w:"Anzug",a:"der"},{w:"Mantel",a:"der"},{w:"Pullover",a:"der"},{w:"Schuh",a:"der"},{w:"Hut",a:"der"},
- {w:"Ring",a:"der"},{w:"Schlüssel",a:"der"},{w:"Rucksack",a:"der"},{w:"Schal",a:"der"},{w:"Koffer",a:"der"},
- {w:"Krieg",a:"der"},{w:"Frieden",a:"der"},{w:"Lärm",a:"der"},{w:"Spaß",a:"der"},{w:"Platz",a:"der"},
- {w:"Raum",a:"der"},{w:"Gang",a:"der"},{w:"Fehler",a:"der"},{w:"Unfall",a:"der"},{w:"Erfolg",a:"der"},
-
- /* --- die --- */
- {w:"Frau",a:"die"},{w:"Mutter",a:"die"},{w:"Schwester",a:"die"},{w:"Tochter",a:"die"},{w:"Großmutter",a:"die"},
- {w:"Tante",a:"die"},{w:"Freundin",a:"die"},{w:"Nachbarin",a:"die"},{w:"Kellnerin",a:"die"},{w:"Ärztin",a:"die"},
- {w:"Lehrerin",a:"die"},{w:"Studentin",a:"die"},{w:"Lampe",a:"die"},{w:"Tür",a:"die"},{w:"Fensterbank",a:"die"},
- {w:"Wand",a:"die"},{w:"Decke",a:"die"},{w:"Treppen",a:"die"},{w:"Küche",a:"die"},{w:"Pfanne",a:"die"},
- {w:"Gabel",a:"die"},{w:"Tasse",a:"die"},{w:"Flasche",a:"die"},{w:"Schüssel",a:"die"},{w:"Waschmaschine",a:"die"},
- {w:"Tastatur",a:"die"},{w:"Maus",a:"die"},{w:"Kamera",a:"die"},{w:"Brille",a:"die"},{w:"Uhr",a:"die"},
- {w:"Kette",a:"die"},{w:"Mütze",a:"die"},{w:"Jacke",a:"die"},{w:"Hose",a:"die"},{w:"Socke",a:"die"},
- {w:"Bluse",a:"die"},{w:"Handtasche",a:"die"},{w:"Straße",a:"die"},{w:"Brücke",a:"die"},{w:"Stadt",a:"die"},
- {w:"Hauptstadt",a:"die"},{w:"Wohnung",a:"die"},{w:"Adresse",a:"die"},{w:"Post",a:"die"},{w:"Polizei",a:"die"},
- {w:"Bank",a:"die"},{w:"Apotheke",a:"die"},{w:"Schule",a:"die"},{w:"Universität",a:"die"},{w:"Bibliothek",a:"die"},
- {w:"Firma",a:"die"},{w:"Arbeit",a:"die"},{w:"Prüfung",a:"die"},{w:"Frage",a:"die"},{w:"Antwort",a:"die"},
- {w:"Idee",a:"die"},{w:"Zeitung",a:"die"},{w:"Sprache",a:"die"},{w:"Lektion",a:"die"},{w:"Geschichte",a:"die"},
- {w:"Musik",a:"die"},{w:"Kunst",a:"die"},{w:"Natur",a:"die"},{w:"Luft",a:"die"},{w:"Erde",a:"die"},
- {w:"Sonne",a:"die"},{w:"Wolke",a:"die"},{w:"Wüste",a:"die"},{w:"Insel",a:"die"},{w:"Zeit",a:"die"},
- {w:"Stunde",a:"die"},{w:"Minute",a:"die"},{w:"Sekunde",a:"die"},{w:"Woche",a:"die"},{w:"Nacht",a:"die"},
- {w:"Reise",a:"die"},{w:"Feier",a:"die"},{w:"Party",a:"die"},{w:"Hochzeit",a:"die"},{w:"Geburt",a:"die"},
- {w:"Gesundheit",a:"die"},{w:"Krankheit",a:"die"},{w:"Medizin",a:"die"},{w:"Diät",a:"die"},{w:"Erholung",a:"die"},
- {w:"Email",a:"die"},{w:"Nachricht",a:"die"},{w:"Batterie",a:"die"},{w:"Karte",a:"die"},{w:"Rechnung",a:"die"},
-
- /* --- das --- */
- {w:"Kind",a:"das"},{w:"Baby",a:"das"},{w:"Mädchen",a:"das"},{w:"Haus",a:"das"},{w:"Zimmer",a:"das"},
- {w:"Wohnzimmer",a:"das"},{w:"Schlafzimmer",a:"das"},{w:"Badezimmer",a:"das"},{w:"Bett",a:"das"},{w:"Sofa",a:"das"},
- {w:"Regal",a:"das"},{w:"Fenster",a:"das"},{w:"Dach",a:"das"},{w:"Bild",a:"das"},{w:"Foto",a:"das"},
- {w:"Handy",a:"das"},{w:"Telefon",a:"das"},{w:"Radio",a:"das"},{w:"Tablet",a:"das"},{w:"Ladegerät",a:"das"},
- {w:"Buch",a:"das"},{w:"Heft",a:"das"},{w:"Papier",a:"das"},{w:"Wörterbuch",a:"das"},{w:"Spiel",a:"das"},
- {w:"Lied",a:"das"},{w:"Instrument",a:"das"},{w:"Orchester",a:"das"},{w:"Konzert",a:"das"},{w:"Ticket",a:"das"},
- {w:"Auto",a:"das"},{w:"Fahrrad",a:"das"},{w:"Motorrad",a:"das"},{w:"Flugzeug",a:"das"},{w:"Schiff",a:"das"},
- {w:"Boot",a:"das"},{w:"Taxi",a:"das"},{w:"Pferd",a:"das"},{w:"Schaf",a:"das"},{w:"Rind",a:"das"},
- {w:"Land",a:"das"},{w:"Meer",a:"das"},{w:"Wasser",a:"das"},{w:"Feuer",a:"das"},{w:"Eis",a:"das"},
- {w:"Frühstück",a:"das"},{w:"Mittagessen",a:"das"},{w:"Abendessen",a:"das"},{w:"Brot",a:"das"},{w:"Ei",a:"das"},
- {w:"Fleisch",a:"das"},{w:"Gemüse",a:"das"},{w:"Obst",a:"das"},{w:"Salz",a:"das"},{w:"Öl",a:"das"},
- {w:"Problem",a:"das"},{w:"Thema",a:"das"},{w:"Beispiel",a:"das"},{w:"Projekt",a:"das"},{w:"Ergebnis",a:"das"},
- {w:"Gespräch",a:"das"},{w:"Wort",a:"das"},{w:"Leben",a:"das"},{w:"Jahr",a:"das"},{w:"Datum",a:"das"},
- {w:"Bildschirmfoto",a:"das"},{w:"Glas",a:"das"},{w:"Messer",a:"das"},{w:"Armband",a:"das"},{w:"Hemd",a:"das"},
- {w:"T-Shirt",a:"das"},{w:"Kleid",a:"das"},{w:"Bein",a:"das"},{w:"Auge",a:"das"},{w:"Ohr",a:"das"},
- {w:"Gesicht",a:"das"},{w:"Haar",a:"das"},{w:"Herz",a:"das"},{w:"Knie",a:"das"},{w:"Blut",a:"das"},
- {w:"Gewitter",a:"das"},{w:"Wetter",a:"das"},{w:"Licht",a:"das"},{w:"Bildnis",a:"das"},{w:"Gedicht",a:"das"}
+// ---------- der ----------
+{w:"Mann",a:"der"},{w:"Junge",a:"der"},{w:"Vater",a:"der"},{w:"Bruder",a:"der"},{w:"Sohn",a:"der"},
+{w:"Großvater",a:"der"},{w:"Onkel",a:"der"},{w:"Arzt",a:"der"},{w:"Lehrer",a:"der"},{w:"Student",a:"der"},
+{w:"Freund",a:"der"},{w:"Nachbar",a:"der"},{w:"Kellner",a:"der"},{w:"Polizist",a:"der"},{w:"Ingenieur",a:"der"},
+{w:"Tisch",a:"der"},{w:"Stuhl",a:"der"},{w:"Schrank",a:"der"},{w:"Sessel",a:"der"},{w:"Teppich",a:"der"},
+{w:"Computer",a:"der"},{w:"Bildschirm",a:"der"},{w:"Drucker",a:"der"},{w:"Kühlschrank",a:"der"},{w:"Herd",a:"der"},
+{w:"Ofen",a:"der"},{w:"Löffel",a:"der"},{w:"Teller",a:"der"},{w:"Kamm",a:"der"},{w:"Spiegel",a:"der"},
+{w:"Hund",a:"der"},{w:"Vogel",a:"der"},{w:"Fisch",a:"der"},{w:"Tiger",a:"der"},{w:"Elefant",a:"der"},
+{w:"Baum",a:"der"},{w:"Fluss",a:"der"},{w:"Berg",a:"der"},{w:"See",a:"der"},{w:"Wald",a:"der"},
+{w:"Tag",a:"der"},{w:"Abend",a:"der"},{w:"Morgen",a:"der"},{w:"Winter",a:"der"},{w:"Sommer",a:"der"},
+{w:"Frühling",a:"der"},{w:"Herbst",a:"der"},{w:"Regen",a:"der"},{w:"Schnee",a:"der"},{w:"Wind",a:"der"},
+{w:"Arm",a:"der"},{w:"Fuß",a:"der"},{w:"Kopf",a:"der"},{w:"Mund",a:"der"},{w:"Finger",a:"der"},
+{w:"Zahn",a:"der"},{w:"Rücken",a:"der"},{w:"Bauch",a:"der"},{w:"Durst",a:"der"},{w:"Hunger",a:"der"},
+{w:"Stift",a:"der"},{w:"Bleistift",a:"der"},{w:"Kugelschreiber",a:"der"},{w:"Radiergummi",a:"der"},{w:"Ordner",a:"der"},
+{w:"Kalender",a:"der"},{w:"Brief",a:"der"},{w:"Zug",a:"der"},{w:"Bus",a:"der"},{w:"LKW",a:"der"},
+{w:"Bahnhof",a:"der"},{w:"Flughafen",a:"der"},{w:"Markt",a:"der"},{w:"Preis",a:"der"},{w:"Euro",a:"der"},
+{w:"Anzug",a:"der"},{w:"Mantel",a:"der"},{w:"Pullover",a:"der"},{w:"Schuh",a:"der"},{w:"Hut",a:"der"},
+{w:"Ring",a:"der"},{w:"Schlüssel",a:"der"},{w:"Rucksack",a:"der"},{w:"Schal",a:"der"},{w:"Koffer",a:"der"},
+{w:"Krieg",a:"der"},{w:"Frieden",a:"der"},{w:"Lärm",a:"der"},{w:"Spaß",a:"der"},{w:"Platz",a:"der"},
+{w:"Raum",a:"der"},{w:"Gang",a:"der"},{w:"Fehler",a:"der"},{w:"Unfall",a:"der"},{w:"Erfolg",a:"der"},
+// ---------- die ----------
+{w:"Frau",a:"die"},{w:"Mutter",a:"die"},{w:"Schwester",a:"die"},{w:"Tochter",a:"die"},{w:"Großmutter",a:"die"},
+{w:"Tante",a:"die"},{w:"Freundin",a:"die"},{w:"Nachbarin",a:"die"},{w:"Kellnerin",a:"die"},{w:"Ärztin",a:"die"},
+{w:"Lehrerin",a:"die"},{w:"Studentin",a:"die"},{w:"Lampe",a:"die"},{w:"Tür",a:"die"},{w:"Fensterbank",a:"die"},
+{w:"Wand",a:"die"},{w:"Decke",a:"die"},{w:"Treppen",a:"die"},{w:"Küche",a:"die"},{w:"Pfanne",a:"die"},
+{w:"Gabel",a:"die"},{w:"Tasse",a:"die"},{w:"Flasche",a:"die"},{w:"Schüssel",a:"die"},{w:"Waschmaschine",a:"die"},
+{w:"Tastatur",a:"die"},{w:"Maus",a:"die"},{w:"Kamera",a:"die"},{w:"Brille",a:"die"},{w:"Uhr",a:"die"},
+{w:"Kette",a:"die"},{w:"Mütze",a:"die"},{w:"Jacke",a:"die"},{w:"Hose",a:"die"},{w:"Socke",a:"die"},
+{w:"Bluse",a:"die"},{w:"Handtasche",a:"die"},{w:"Straße",a:"die"},{w:"Brücke",a:"die"},{w:"Stadt",a:"die"},
+{w:"Hauptstadt",a:"die"},{w:"Wohnung",a:"die"},{w:"Adresse",a:"die"},{w:"Post",a:"die"},{w:"Polizei",a:"die"},
+{w:"Bank",a:"die"},{w:"Apotheke",a:"die"},{w:"Schule",a:"die"},{w:"Universität",a:"die"},{w:"Bibliothek",a:"die"},
+{w:"Firma",a:"die"},{w:"Arbeit",a:"die"},{w:"Prüfung",a:"die"},{w:"Frage",a:"die"},{w:"Antwort",a:"die"},
+{w:"Idee",a:"die"},{w:"Zeitung",a:"die"},{w:"Sprache",a:"die"},{w:"Lektion",a:"die"},{w:"Geschichte",a:"die"},
+{w:"Musik",a:"die"},{w:"Kunst",a:"die"},{w:"Natur",a:"die"},{w:"Luft",a:"die"},{w:"Erde",a:"die"},
+{w:"Sonne",a:"die"},{w:"Wolke",a:"die"},{w:"Wüste",a:"die"},{w:"Insel",a:"die"},{w:"Zeit",a:"die"},
+{w:"Stunde",a:"die"},{w:"Minute",a:"die"},{w:"Sekunde",a:"die"},{w:"Woche",a:"die"},{w:"Nacht",a:"die"},
+{w:"Reise",a:"die"},{w:"Feier",a:"die"},{w:"Party",a:"die"},{w:"Hochzeit",a:"die"},{w:"Geburt",a:"die"},
+{w:"Gesundheit",a:"die"},{w:"Krankheit",a:"die"},{w:"Medizin",a:"die"},{w:"Diät",a:"die"},{w:"Erholung",a:"die"},
+{w:"Email",a:"die"},{w:"Nachricht",a:"die"},{w:"Batterie",a:"die"},{w:"Karte",a:"die"},{w:"Rechnung",a:"die"},
+// ---------- das ----------
+{w:"Kind",a:"das"},{w:"Baby",a:"das"},{w:"Mädchen",a:"das"},{w:"Haus",a:"das"},{w:"Zimmer",a:"das"},
+{w:"Wohnzimmer",a:"das"},{w:"Schlafzimmer",a:"das"},{w:"Badezimmer",a:"das"},{w:"Bett",a:"das"},{w:"Sofa",a:"das"},
+{w:"Regal",a:"das"},{w:"Fenster",a:"das"},{w:"Dach",a:"das"},{w:"Bild",a:"das"},{w:"Foto",a:"das"},
+{w:"Handy",a:"das"},{w:"Telefon",a:"das"},{w:"Radio",a:"das"},{w:"Tablet",a:"das"},{w:"Ladegerät",a:"das"},
+{w:"Buch",a:"das"},{w:"Heft",a:"das"},{w:"Papier",a:"das"},{w:"Wörterbuch",a:"das"},{w:"Spiel",a:"das"},
+{w:"Lied",a:"das"},{w:"Instrument",a:"das"},{w:"Orchester",a:"das"},{w:"Konzert",a:"das"},{w:"Ticket",a:"das"},
+{w:"Auto",a:"das"},{w:"Fahrrad",a:"das"},{w:"Motorrad",a:"das"},{w:"Flugzeug",a:"das"},{w:"Schiff",a:"das"},
+{w:"Boot",a:"das"},{w:"Taxi",a:"das"},{w:"Pferd",a:"das"},{w:"Schaf",a:"das"},{w:"Rind",a:"das"},
+{w:"Land",a:"das"},{w:"Meer",a:"das"},{w:"Wasser",a:"das"},{w:"Feuer",a:"das"},{w:"Eis",a:"das"},
+{w:"Frühstück",a:"das"},{w:"Mittagessen",a:"das"},{w:"Abendessen",a:"das"},{w:"Brot",a:"das"},{w:"Ei",a:"das"},
+{w:"Fleisch",a:"das"},{w:"Gemüse",a:"das"},{w:"Obst",a:"das"},{w:"Salz",a:"das"},{w:"Öl",a:"das"},
+{w:"Problem",a:"das"},{w:"Thema",a:"das"},{w:"Beispiel",a:"das"},{w:"Projekt",a:"das"},{w:"Ergebnis",a:"das"},
+{w:"Gespräch",a:"das"},{w:"Wort",a:"das"},{w:"Leben",a:"das"},{w:"Jahr",a:"das"},{w:"Datum",a:"das"},
+{w:"Bildschirmfoto",a:"das"},{w:"Glas",a:"das"},{w:"Messer",a:"das"},{w:"Armband",a:"das"},{w:"Hemd",a:"das"},
+{w:"T-Shirt",a:"das"},{w:"Kleid",a:"das"},{w:"Bein",a:"das"},{w:"Auge",a:"das"},{w:"Ohr",a:"das"},
+{w:"Gesicht",a:"das"},{w:"Haar",a:"das"},{w:"Herz",a:"das"},{w:"Knie",a:"das"},{w:"Blut",a:"das"},
+{w:"Gewitter",a:"das"},{w:"Wetter",a:"das"},{w:"Licht",a:"das"},{w:"Bildnis",a:"das"},{w:"Gedicht",a:"das"}
 ];
 
-/* ===================== Russisches Wörterbuch ===================== */
+/* ================= 2. Russische Übersetzungen ====================== */
 const ru={
-"Mann":"мужчина","Junge":"мальчик","Vater":"отец","Bruder":"брат","Sohn":"сын","Großvater":"дедушка","Onkel":"дядя",
-"Arzt":"врач","Lehrer":"учитель","Student":"студент","Freund":"друг","Nachbar":"сосед","Kellner":"официант",
-"Polizist":"полицейский","Ingenieur":"инженер","Tisch":"стол","Stuhl":"стул","Schrank":"шкаф","Sessel":"кресло",
-"Teppich":"ковёр","Computer":"компьютер","Bildschirm":"монитор","Drucker":"принтер","Kühlschrank":"холодильник",
-"Herd":"плита","Ofen":"духовка","Löffel":"ложка","Teller":"тарелка","Kamm":"расчёска","Spiegel":"зеркало",
-"Hund":"собака","Vogel":"птица","Fisch":"рыба","Tiger":"тигр","Elefant":"слон","Baum":"дерево","Fluss":"река",
-"Berg":"гора","See":"озеро","Wald":"лес","Tag":"день","Abend":"вечер","Morgen":"утро","Winter":"зима","Sommer":"лето",
-"Frühling":"весна","Herbst":"осень","Regen":"дождь","Schnee":"снег","Wind":"ветер","Arm":"рука","Fuß":"нога",
-"Kopf":"голова","Mund":"рот","Finger":"палец","Zahn":"зуб","Rücken":"спина","Bauch":"живот","Durst":"жажда",
-"Hunger":"голод","Stift":"ручка","Bleistift":"карандаш","Kugelschreiber":"шариковая_ручка",
-"Radiergummi":"ластик","Ordner":"папка","Kalender":"календарь","Brief":"письмо","Zug":"поезд","Bus":"автобус",
-"LKW":"грузовик","Bahnhof":"вокзал","Flughafen":"аэропорт","Markt":"рынок","Preis":"цена","Euro":"евро",
-"Anzug":"костюм","Mantel":"пальто","Pullover":"свитер","Schuh":"ботинок","Hut":"шляпа","Ring":"кольцо",
-"Schlüssel":"ключ","Rucksack":"рюкзак","Schal":"шарф","Koffer":"чемодан","Krieg":"война","Frieden":"мир",
-"Lärm":"шум","Spaß":"веселье","Platz":"площадь","Raum":"пространство","Gang":"коридор","Fehler":"ошибка",
-"Unfall":"авария","Erfolg":"успех",
-
-"Frau":"женщина","Mutter":"мать","Schwester":"сестра","Tochter":"дочь","Großmutter":"бабушка","Tante":"тётя",
-"Freundin":"подруга","Nachbarin":"соседка","Kellnerin":"официантка","Ärztin":"врач","Lehrerin":"учительница",
-"Studentin":"студентка","Lampe":"лампа","Tür":"дверь","Fensterbank":"подоконник","Wand":"стена","Decke":"потолок",
-"Treppen":"лестница","Küche":"кухня","Pfanne":"сковорода","Gabel":"вилка","Tasse":"чашка","Flasche":"бутылка",
-"Schüssel":"миска","Waschmaschine":"стиральная_машина","Tastatur":"клавиатура","Maus":"мышь","Kamera":"камера",
-"Brille":"очки","Uhr":"часы","Kette":"цепочка","Mütze":"шапка","Jacke":"куртка","Hose":"брюки","Socke":"носк",
-"Bluse":"блузка","Handtasche":"сумочка","Straße":"улица","Brücke":"мост","Stadt":"город","Hauptstadt":"столица",
-"Wohnung":"квартира","Adresse":"адрес","Post":"почта","Polizei":"полиция","Bank":"банк","Apotheke":"аптека",
-"Schule":"школа","Universität":"университет","Bibliothek":"библиотека","Firma":"фирма","Arbeit":"работа",
-"Prüfung":"экзамен","Frage":"вопрос","Antwort":"ответ","Idee":"идея","Zeitung":"газета","Sprache":"язык",
-"Lektion":"урок","Geschichte":"история","Musik":"музыка","Kunst":"искусство","Natur":"природа","Luft":"воздух",
-"Erde":"земля","Sonne":"солнце","Wolke":"облако","Wüste":"пустыня","Insel":"остров","Zeit":"время","Stunde":"час",
-"Minute":"минута","Sekunde":"секунда","Woche":"неделя","Nacht":"ночь","Reise":"путешествие","Feier":"праздник",
-"Party":"вечеринка","Hochzeit":"свадьба","Geburt":"рождение","Gesundheit":"здоровье","Krankheit":"болезнь",
-"Medizin":"медицина","Diät":"диета","Erholung":"отдых","Email":"электронная_почта","Nachricht":"сообщение",
-"Batterie":"батарея","Karte":"карта","Rechnung":"счёт",
-
-"Kind":"ребёнок","Baby":"малыш","Mädchen":"девочка","Haus":"дом","Zimmer":"комната","Wohnzimmer":"гостиная",
-"Schlafzimmer":"спальня","Badezimmer":"ванная","Bett":"кровать","Sofa":"диван","Regal":"полка","Fenster":"окно",
-"Dach":"крыша","Bild":"картина","Foto":"фото","Handy":"мобильник","Telefon":"телефон","Radio":"радио",
-"Tablet":"планшет","Ladegerät":"зарядное_устройство","Buch":"книга","Heft":"тетрадь","Papier":"бумага",
-"Wörterbuch":"словарь","Spiel":"игра","Lied":"песня","Instrument":"инструмент","Orchester":"оркестр",
-"Konzert":"концерт","Ticket":"билет","Auto":"автомобиль","Fahrrad":"велосипед","Motorrad":"мотоцикл",
-"Flugzeug":"самолёт","Schiff":"корабль","Boot":"лодка","Taxi":"такси","Pferd":"лошадь","Schaf":"овца",
-"Rind":"крупный_рогатый_скот","Land":"страна","Meer":"море","Wasser":"вода","Feuer":"огонь","Eis":"лёд",
-"Frühstück":"завтрак","Mittagessen":"обед","Abendessen":"ужин","Brot":"хлеб","Ei":"яйцо","Fleisch":"мясо",
-"Gemüse":"овощи","Obst":"фрукты","Salz":"соль","Öl":"масло","Problem":"проблема","Thema":"тема",
-"Beispiel":"пример","Projekt":"проект","Ergebnis":"результат","Gespräch":"разговор","Wort":"слово",
-"Leben":"жизнь","Jahr":"год","Datum":"дата","Bildschirmfoto":"скриншот","Glas":"стакан","Messer":"нож",
-"Armband":"браслет","Hemd":"рубашка","T-Shirt":"футболка","Kleid":"платье","Bein":"нога","Auge":"глаз",
-"Ohr":"ухо","Gesicht":"лицо","Haar":"волос","Herz":"сердце","Knie":"колено","Blut":"кровь",
-"Gewitter":"гроза","Wetter":"погода","Licht":"свет","Bildnis":"образ","Gedicht":"стихотворение"
+"Abend":"вечер","Abendessen":"ужин","Adresse":"адрес","Apotheke":"аптека","Apfel":"яблоко","Arbeit":"работа",
+"Armband":"браслет","Arzt":"врач","Auto":"автомобиль","Baby":"малыш","Bahnhof":"вокзал","Bank":"банк",
+"Bauch":"живот","Baum":"дерево","Bein":"нога","Beispiel":"пример","Berg":"гора","Beruf":"профессия",
+"Bild":"картина","Bildnis":"образ","Bildschirm":"монитор","Bildschirmfoto":"скриншот","Blume":"цветок",
+"Blut":"кровь","Boot":"лодка","Bratpfanne":"сковорода","Brief":"письмо","Brille":"очки","Brücke":"мост",
+"Bruder":"брат","Buch":"книга","Bus":"автобус","Computer":"компьютер","Datum":"дата","Decke":"потолок",
+"Diät":"диета","Doktor":"врач","Durst":"жажда","Ei":"яйцо","Elefant":"слон","Email":"электронная почта",
+"Erde":"земля","Erfolg":"успех","Ergebnis":"результат","Erholung":"отдых","Euro":"евро","Fahrrad":"велосипед",
+"Feier":"праздник","Fehler":"ошибка","Feuer":"огонь","Fisch":"рыба","Flasche":"бутылка","Flughafen":"аэропорт",
+"Flugzeug":"самолёт","Foto":"фото","Freund":"друг","Freundin":"подруга","Frühling":"весна","Frühstück":"завтрак",
+"Frage":"вопрос","Frau":"женщина","Frieden":"мир","Fuß":"нога","Gang":"коридор","Gabel":"вилка",
+"Geburt":"рождение","Gedicht":"стихотворение","Gemüse":"овощи","Gesicht":"лицо","Gespräch":"разговор",
+"Gesundheit":"здоровье","Gewitter":"гроза","Glas":"стакан","Großmutter":"бабушка","Großvater":"дедушка",
+"Haus":"дом","Haut":"кожа","Hemd":"рубашка","Herbst":"осень","Herz":"сердце","Hund":"собака",
+"Hunger":"голод","Hut":"шляпа","Idee":"идея","Ingenieur":"инженер","Insel":"остров","Jacke":"куртка",
+"Jahr":"год","Junge":"мальчик","Kalender":"календарь","Kamera":"камера","Karte":"карта","Kellner":"официант",
+"Kellnerin":"официантка","Kette":"цепочка","Knie":"колено","Koffer":"чемодан","Kopf":"голова",
+"Krankheit":"болезнь","Krieg":"война","Kühlschrank":"холодильник","Kugelschreiber":"ручка","Kunst":"искусство",
+"Ladegerät":"зарядка","Lampe":"лампа","Land":"страна","Lärm":"шум","Lektion":"урок","Lehrer":"учитель",
+"Licht":"свет","Lied":"песня","Löffel":"ложка","Luft":"воздух","Mädchen":"девочка","Mantel":"пальто",
+"Markt":"рынок","Maus":"мышь","Meer":"море","Medizin":"медицина","Messer":"нож","Minute":"минута",
+"Motorrad":"мотоцикл","Mutter":"мать","Nacht":"ночь","Nachbar":"сосед","Nachbarin":"соседка",
+"Nachricht":"сообщение","Natur":"природа","Onkel":"дядя","Ordner":"папка","Ohr":"ухо","Papier":"бумага",
+"Party":"вечеринка","Pfanne":"сковорода","Pferd":"лошадь","Polizei":"полиция","Polizist":"полицейский",
+"Preis":"цена","Problem":"проблема","Projekt":"проект","Prüfung":"экзамен","Pullover":"свитер",
+"Radio":"радио","Radiergummi":"ластик","Rechnung":"счёт","Regen":"дождь","Reise":"путешествие",
+"Ring":"кольцо","Rind":"корова","Rucksack":"рюкзак","Salat":"салат","Salz":"соль","Schaf":"овца",
+"Schal":"шарф","Schiff":"корабль","Schlüssel":"ключ","Schnee":"снег","Schrank":"шкаф","Schuh":"ботинок",
+"Schule":"школа","Schwester":"сестра","Seele":"душа","See":"озеро","Sekunde":"секунда","Sessel":"кресло",
+"Sommer":"лето","Sonne":"солнце","Spaß":"веселье","Spiegel":"зеркало","Spiel":"игра","Sprache":"язык",
+"Stadt":"город","Stift":"карандаш","Straße":"улица","Student":"студент","Studentin":"студентка",
+"Stuhl":"стул","Tag":"день","Taxi":"такси","Tee":"чай","Telefon":"телефон","Teller":"тарелка",
+"Thema":"тема","Tiger":"тигр","Tisch":"стол","Tochter":"дочь","Tomate":"помидор","Topf":"кастрюля",
+"Treppen":"лестница","Tür":"дверь","Uhr":"часы","Universität":"университет","Urlaub":"отпуск",
+"Vater":"отец","Vogel":"птица","Wand":"стена","Wasser":"вода","Wein":"вино","Wetter":"погода",
+"Winter":"зима","Woche":"неделя","Wohnung":"квартира","Wolke":"облако","Wohnzimmer":"гостиная",
+"Wörterbuch":"словарь","Wüste":"пустыня","Zeit":"время","Zeitung":"газета","Zug":"поезд"
 };
 
-/* ========================= Status & DOM ========================== */
+/* ================= 3. Status & DOM-Referenzen ====================== */
 let current=null,answered=false,totalCorrect=0,history=[];
 const wordEl=document.getElementById("word"),
       feedbackEl=document.getElementById("feedback"),
@@ -194,7 +222,7 @@ const wordEl=document.getElementById("word"),
       dasBtn=document.getElementById("das-btn"),
       ruBtn=document.getElementById("ru-btn");
 
-/* ============================ Events ============================= */
+/* ========================== 4. Events ============================= */
 derBtn.addEventListener("click",()=>check("der"));
 dieBtn.addEventListener("click",()=>check("die"));
 dasBtn.addEventListener("click",()=>check("das"));
@@ -202,22 +230,18 @@ dasBtn.addEventListener("click",()=>check("das"));
 ["mouseup","mouseleave","touchend","touchcancel"].forEach(ev=>ruBtn.addEventListener(ev,hideRu));
 window.addEventListener("DOMContentLoaded",init);
 
-/* ============================ Logic ============================== */
+/* ========================== 5. Logic ============================== */
 function init(){
   loadStats();
   updateStats();
   nextWord();
 }
 function loadStats(){
-  try{
-    const d=JSON.parse(localStorage.getItem("dddStats")||"null");
-    if(d){totalCorrect=d.totalCorrect||0;history=d.history||[]}
-  }catch{}
+  try{const d=JSON.parse(localStorage.getItem("dddStats")||"null");
+      if(d){totalCorrect=d.totalCorrect||0;history=d.history||[]}}catch{}
 }
 function saveStats(){
-  try{
-    localStorage.setItem("dddStats",JSON.stringify({totalCorrect,history}));
-  }catch{}
+  try{localStorage.setItem("dddStats",JSON.stringify({totalCorrect,history}))}catch{}
 }
 function nextWord(){
   current=germanNouns[Math.floor(Math.random()*germanNouns.length)];
@@ -226,11 +250,11 @@ function nextWord(){
   [derBtn,dieBtn,dasBtn].forEach(b=>b.classList.remove("correct","incorrect"));
   feedbackEl.textContent="";
 }
-function check(art){
+function check(a){
   if(answered)return;
   answered=true;
-  const ok=art===current.a;
-  document.querySelector(`.${art}-btn`).classList.add(ok?"correct":"incorrect");
+  const ok=a===current.a;
+  document.querySelector(`.${a}-btn`).classList.add(ok?"correct":"incorrect");
   if(!ok)document.querySelector(`.${current.a}-btn`).classList.add("correct");
   feedbackEl.textContent=ok?"Richtig!":`Falsch – ${current.a} ${current.w}`;
   if(ok)totalCorrect++;
@@ -240,16 +264,13 @@ function check(art){
 }
 function updateStats(){
   totalScoreEl.textContent=totalCorrect;
-  const ok=history.filter(Boolean).length,rate=history.length?Math.round(ok/history.length*100):0;
-  successRateEl.textContent=rate; successFillEl.style.width=rate+"%";
+  const ok=history.filter(Boolean).length,
+        rate=history.length?Math.round(ok/history.length*100):0;
+  successRateEl.textContent=rate;
+  successFillEl.style.width=rate+"%";
 }
-function showRu(e){
-  wordEl.textContent=ru[current.w]||"—";
-  e.preventDefault();
-}
-function hideRu(){
-  wordEl.textContent=current.w;
-}
+function showRu(e){wordEl.textContent=ru[current.w]||"—";e.preventDefault();}
+function hideRu(){wordEl.textContent=current.w;}
 </script>
 </body>
 </html>
