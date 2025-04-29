@@ -1,576 +1,255 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Der Die Das Trainer</title>
-    <style>
-        :root {
-            --background-color: #FFFFFF;
-            --container-color: #F9F9F9;
-            --text-color: #777;
-            --highlight-yellow: #FFFBC8;
-            --highlight-green: #D7F8E8;
-            --highlight-red: #FFDFDF;
-            --highlight-blue: #E0F2FF;
-            --der-color: #B8D0FF;
-            --die-color: #FFCFE9;
-            --das-color: #D0FFDB;
-        }
-        
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background-color: var(--background-color);
-            color: var(--text-color);
-            padding: 20px;
-            max-width: 600px;
-            margin: 0 auto;
-            line-height: 1.5;
-        }
-        
-        h1 {
-            font-size: 2.5rem;
-            text-align: center;
-            margin: 25px 0 15px;
-            color: #555;
-            font-weight: 600;
-        }
-        
-        p.subtitle {
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 1.1rem;
-            color: #888;
-        }
-        
-        .word-display {
-            background-color: var(--container-color);
-            padding: 35px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            text-align: center;
-            box-shadow: 0 3px 15px rgba(0,0,0,0.05);
-        }
-        
-        .word {
-            font-size: 3rem;
-            color: #444;
-            font-weight: 600;
-        }
-        
-        .success-bar {
-            height: 12px;
-            background-color: #eee;
-            border-radius: 6px;
-            margin-bottom: 8px;
-            overflow: hidden;
-        }
-        
-        .success-fill {
-            height: 100%;
-            background-color: var(--highlight-green);
-            border-radius: 6px;
-            width: 0%;
-            transition: width 0.5s ease;
-        }
-        
-        .success-text {
-            text-align: center;
-            font-size: 0.9rem;
-            margin-bottom: 30px;
-            color: #888;
-        }
-        
-        .article-buttons {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-        
-        .article-btn {
-            flex: 1;
-            padding: 20px 15px;
-            font-size: 1.8rem;
-            border: none;
-            border-radius: 12px;
-            background-color: white;
-            cursor: pointer;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
-            transition: all 0.3s ease;
-        }
-        
-        .article-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        
-        .der-btn {
-            border-bottom: 5px solid var(--der-color);
-            color: #555;
-        }
-        
-        .die-btn {
-            border-bottom: 5px solid var(--die-color);
-            color: #555;
-        }
-        
-        .das-btn {
-            border-bottom: 5px solid var(--das-color);
-            color: #555;
-        }
-        
-        .correct {
-            background-color: var(--highlight-green);
-        }
-        
-        .incorrect {
-            background-color: var(--highlight-red);
-        }
-        
-        .feedback {
-            text-align: center;
-            font-size: 1.3rem;
-            min-height: 35px;
-            margin-bottom: 30px;
-            font-weight: 500;
-            color: #555;
-        }
-        
-        .score-box {
-            background-color: var(--container-color);
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-            box-shadow: 0 3px 15px rgba(0,0,0,0.05);
-        }
-        
-        .score-label {
-            font-size: 1rem;
-            color: #888;
-            margin-bottom: 8px;
-        }
-        
-        .score-value {
-            font-size: 2.5rem;
-            font-weight: 600;
-            color: #444;
-        }
-        
-        footer {
-            text-align: center;
-            margin-top: 40px;
-            padding: 20px;
-            font-size: 0.8rem;
-            color: #aaa;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Der Die Das Trainer</title>
+<style>
+:root{
+ --background-color:#fff;
+ --container-color:#f9f9f9;
+ --text-color:#777;
+ --highlight-green:#d7f8e8;
+ --highlight-red:#ffdfdf;
+ --der-color:#b8d0ff;
+ --die-color:#ffcfe9;
+ --das-color:#d0ffdb;
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif}
+body{background:var(--background-color);color:var(--text-color);padding:20px;max-width:600px;margin:0 auto;line-height:1.5}
+.word-display{background:var(--container-color);padding:35px;border-radius:15px;margin-bottom:30px;text-align:center;box-shadow:0 3px 15px rgba(0,0,0,.05);position:relative}
+.word{font-size:3rem;color:#444;font-weight:600;min-height:3.2rem}
+.ru-btn{position:absolute;right:15px;bottom:15px;width:46px;height:46px;border-radius:50%;border:none;background:#d0d0d0;color:#444;font-weight:600;cursor:pointer}
+.ru-btn:active{transform:scale(.95)}
+.success-bar{height:12px;background:#eee;border-radius:6px;margin-bottom:8px;overflow:hidden}
+.success-fill{height:100%;background:var(--highlight-green);border-radius:6px;width:0;transition:width .5s}
+.success-text{text-align:center;font-size:.9rem;margin-bottom:30px;color:#888}
+.article-buttons{display:flex;gap:15px;margin-bottom:25px}
+.article-btn{flex:1;padding:20px 15px;font-size:1.8rem;border:none;border-radius:12px;background:#fff;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.05);transition:all .3s}
+.article-btn:hover{transform:translateY(-3px);box-shadow:0 5px 15px rgba(0,0,0,.1)}
+.der-btn{border-bottom:5px solid var(--der-color);color:#555}
+.die-btn{border-bottom:5px solid var(--die-color);color:#555}
+.das-btn{border-bottom:5px solid var(--das-color);color:#555}
+.correct{background:var(--highlight-green)}
+.incorrect{background:var(--highlight-red)}
+.feedback{text-align:center;font-size:1.3rem;min-height:35px;margin-bottom:30px;font-weight:500;color:#555}
+.score-box{background:var(--container-color);padding:20px;border-radius:15px;text-align:center;box-shadow:0 3px 15px rgba(0,0,0,.05)}
+.score-label{font-size:1rem;color:#888;margin-bottom:8px}
+.score-value{font-size:2.5rem;font-weight:600;color:#444}
+footer{text-align:center;margin-top:40px;padding:20px;font-size:.8rem;color:#aaa}
+</style>
 </head>
 <body>
-    <h1>Der Die Das Trainer</h1>
-    <p class="subtitle">Wähle den richtigen Artikel für das angezeigte Nomen</p>
-    
-    <div class="word-display">
-        <div class="word" id="word">Haus</div>
-    </div>
-    
-    <div class="success-bar">
-        <div class="success-fill" id="success-fill"></div>
-    </div>
-    <div class="success-text">Erfolgsquote: <span id="success-rate">0</span>%</div>
-    
-    <div class="article-buttons">
-        <button class="article-btn der-btn" id="der-btn">der</button>
-        <button class="article-btn die-btn" id="die-btn">die</button>
-        <button class="article-btn das-btn" id="das-btn">das</button>
-    </div>
-    
-    <div class="feedback" id="feedback"></div>
-    
-    <div class="score-box">
-        <div class="score-label">Gesamtpunktzahl</div>
-        <div class="score-value" id="total-score">0</div>
-    </div>
-    
-    <footer>
-        Der Die Das Trainer - Eine Web-App zum Üben deutscher Artikel
-    </footer>
-    
-    <script>
-        // Globale Variablen
-        let currentWord = null;
-        let answered = false;
-        let totalCorrect = 0;
-        let history = [];
-        
-        // DOM-Elemente
-        const wordElement = document.getElementById('word');
-        const feedbackElement = document.getElementById('feedback');
-        const totalScoreElement = document.getElementById('total-score');
-        const successRateElement = document.getElementById('success-rate');
-        const successFillElement = document.getElementById('success-fill');
-        const derBtn = document.getElementById('der-btn');
-        const dieBtn = document.getElementById('die-btn');
-        const dasBtn = document.getElementById('das-btn');
-        
-        // Deutsche Grundwörter mit Artikeln
-        const germanNouns = [
-            // der (maskulin)
-            { word: "Mann", article: "der" },
-            { word: "Junge", article: "der" },
-            { word: "Vater", article: "der" },
-            { word: "Bruder", article: "der" },
-            { word: "Sohn", article: "der" },
-            { word: "Onkel", article: "der" },
-            { word: "Großvater", article: "der" },
-            { word: "Freund", article: "der" },
-            { word: "Nachbar", article: "der" },
-            { word: "Lehrer", article: "der" },
-            { word: "Arzt", article: "der" },
-            { word: "Tisch", article: "der" },
-            { word: "Stuhl", article: "der" },
-            { word: "Schrank", article: "der" },
-            { word: "Teller", article: "der" },
-            { word: "Löffel", article: "der" },
-            { word: "Topf", article: "der" },
-            { word: "Kühlschrank", article: "der" },
-            { word: "Herd", article: "der" },
-            { word: "Computer", article: "der" },
-            { word: "Fernseher", article: "der" },
-            { word: "Bildschirm", article: "der" },
-            { word: "Drucker", article: "der" },
-            { word: "Kalender", article: "der" },
-            { word: "Stift", article: "der" },
-            { word: "Bleistift", article: "der" },
-            { word: "Kugelschreiber", article: "der" },
-            { word: "Radiergummi", article: "der" },
-            { word: "Ordner", article: "der" },
-            { word: "Rucksack", article: "der" },
-            { word: "Koffer", article: "der" },
-            { word: "Schlüssel", article: "der" },
-            { word: "Ring", article: "der" },
-            { word: "Schal", article: "der" },
-            { word: "Mantel", article: "der" },
-            { word: "Pullover", article: "der" },
-            { word: "Anzug", article: "der" },
-            { word: "Schuh", article: "der" },
-            { word: "Stiefel", article: "der" },
-            { word: "Hut", article: "der" },
-            { word: "Fluss", article: "der" },
-            { word: "See", article: "der" },
-            { word: "Berg", article: "der" },
-            { word: "Wald", article: "der" },
-            { word: "Garten", article: "der" },
-            { word: "Park", article: "der" },
-            { word: "Baum", article: "der" },
-            { word: "Apfel", article: "der" },
-            { word: "Kuchen", article: "der" },
-            { word: "Kaffee", article: "der" },
-            { word: "Tee", article: "der" },
-            { word: "Saft", article: "der" },
-            { word: "Wein", article: "der" },
-            { word: "Käse", article: "der" },
-            { word: "Reis", article: "der" },
-            { word: "Salat", article: "der" },
-            { word: "Fisch", article: "der" },
-            { word: "Hund", article: "der" },
-            { word: "Vogel", article: "der" },
-            { word: "Tag", article: "der" },
-            { word: "Monat", article: "der" },
-            { word: "Morgen", article: "der" },
-            { word: "Abend", article: "der" },
-            { word: "Winter", article: "der" },
-            { word: "Sommer", article: "der" },
-            { word: "Frühling", article: "der" },
-            { word: "Herbst", article: "der" },
-            { word: "Regen", article: "der" },
-            { word: "Schnee", article: "der" },
-            { word: "Wind", article: "der" },
-            { word: "Film", article: "der" },
-            { word: "Brief", article: "der" },
-            { word: "Zettel", article: "der" },
-            { word: "Name", article: "der" },
-            { word: "Beruf", article: "der" },
-            { word: "Termin", article: "der" },
-            { word: "Urlaub", article: "der" },
-            { word: "Unfall", article: "der" },
-            { word: "Fehler", article: "der" },
-            { word: "Preis", article: "der" },
-            { word: "Markt", article: "der" },
-            { word: "Mund", article: "der" },
-            { word: "Kopf", article: "der" },
-            { word: "Arm", article: "der" },
-            { word: "Fuß", article: "der" },
-            { word: "Bauch", article: "der" },
-            { word: "Rücken", article: "der" },
-            { word: "Zahn", article: "der" },
-            { word: "Finger", article: "der" },
-            
-            // die (feminin)
-            { word: "Frau", article: "die" },
-            { word: "Mutter", article: "die" },
-            { word: "Schwester", article: "die" },
-            { word: "Tochter", article: "die" },
-            { word: "Tante", article: "die" },
-            { word: "Großmutter", article: "die" },
-            { word: "Freundin", article: "die" },
-            { word: "Nachbarin", article: "die" },
-            { word: "Lehrerin", article: "die" },
-            { word: "Ärztin", article: "die" },
-            { word: "Lampe", article: "die" },
-            { word: "Tür", article: "die" },
-            { word: "Wand", article: "die" },
-            { word: "Decke", article: "die" },
-            { word: "Küche", article: "die" },
-            { word: "Gabel", article: "die" },
-            { word: "Tasse", article: "die" },
-            { word: "Flasche", article: "die" },
-            { word: "Kanne", article: "die" },
-            { word: "Pfanne", article: "die" },
-            { word: "Waschmaschine", article: "die" },
-            { word: "Tastatur", article: "die" },
-            { word: "Maus", article: "die" },
-            { word: "Uhr", article: "die" },
-            { word: "Brille", article: "die" },
-            { word: "Tasche", article: "die" },
-            { word: "Kamera", article: "die" },
-            { word: "Kette", article: "die" },
-            { word: "Mütze", article: "die" },
-            { word: "Jacke", article: "die" },
-            { word: "Hose", article: "die" },
-            { word: "Socke", article: "die" },
-            { word: "Straße", article: "die" },
-            { word: "Brücke", article: "die" },
-            { word: "Stadt", article: "die" },
-            { word: "Wohnung", article: "die" },
-            { word: "Blume", article: "die" },
-            { word: "Banane", article: "die" },
-            { word: "Milch", article: "die" },
-            { word: "Butter", article: "die" },
-            { word: "Schokolade", article: "die" },
-            { word: "Suppe", article: "die" },
-            { word: "Tomate", article: "die" },
-            { word: "Kartoffel", article: "die" },
-            { word: "Zwiebel", article: "die" },
-            { word: "Katze", article: "die" },
-            { word: "Woche", article: "die" },
-            { word: "Nacht", article: "die" },
-            { word: "Minute", article: "die" },
-            { word: "Stunde", article: "die" },
-            { word: "Sekunde", article: "die" },
-            { word: "Zeit", article: "die" },
-            { word: "Sonne", article: "die" },
-            { word: "Wolke", article: "die" },
-            { word: "Luft", article: "die" },
-            { word: "Erde", article: "die" },
-            { word: "Karte", article: "die" },
-            { word: "Zeitung", article: "die" },
-            { word: "Sprache", article: "die" },
-            { word: "Frage", article: "die" },
-            { word: "Antwort", article: "die" },
-            { word: "Idee", article: "die" },
-            { word: "Reise", article: "die" },
-            { word: "Arbeit", article: "die" },
-            { word: "Prüfung", article: "die" },
-            { word: "Schule", article: "die" },
-            { word: "Universität", article: "die" },
-            { word: "Krankheit", article: "die" },
-            { word: "Medizin", article: "die" },
-            { word: "Hand", article: "die" },
-            { word: "Nase", article: "die" },
-            { word: "Zunge", article: "die" },
-            { word: "Schulter", article: "die" },
-            { word: "Brust", article: "die" },
-            { word: "Haut", article: "die" },
-            
-            // das (neutral)
-            { word: "Kind", article: "das" },
-            { word: "Baby", article: "das" },
-            { word: "Mädchen", article: "das" },
-            { word: "Haus", article: "das" },
-            { word: "Bett", article: "das" },
-            { word: "Sofa", article: "das" },
-            { word: "Regal", article: "das" },
-            { word: "Fenster", article: "das" },
-            { word: "Dach", article: "das" },
-            { word: "Zimmer", article: "das" },
-            { word: "Badezimmer", article: "das" },
-            { word: "Schlafzimmer", article: "das" },
-            { word: "Messer", article: "das" },
-            { word: "Glas", article: "das" },
-            { word: "Radio", article: "das" },
-            { word: "Telefon", article: "das" },
-            { word: "Handy", article: "das" },
-            { word: "Buch", article: "das" },
-            { word: "Heft", article: "das" },
-            { word: "Bild", article: "das" },
-            { word: "Foto", article: "das" },
-            { word: "Papier", article: "das" },
-            { word: "Armband", article: "das" },
-            { word: "Hemd", article: "das" },
-            { word: "T-Shirt", article: "das" },
-            { word: "Kleid", article: "das" },
-            { word: "Dorf", article: "das" },
-            { word: "Land", article: "das" },
-            { word: "Meer", article: "das" },
-            { word: "Wasser", article: "das" },
-            { word: "Feuer", article: "das" },
-            { word: "Eis", article: "das" },
-            { word: "Brot", article: "das" },
-            { word: "Ei", article: "das" },
-            { word: "Fleisch", article: "das" },
-            { word: "Obst", article: "das" },
-            { word: "Gemüse", article: "das" },
-            { word: "Salz", article: "das" },
-            { word: "Öl", article: "das" },
-            { word: "Pferd", article: "das" },
-            { word: "Schwein", article: "das" },
-            { word: "Schaf", article: "das" },
-            { word: "Tier", article: "das" },
-            { word: "Jahr", article: "das" },
-            { word: "Datum", article: "das" },
-            { word: "Jahrhundert", article: "das" },
-            { word: "Licht", article: "das" },
-            { word: "Wetter", article: "das" },
-            { word: "Gewitter", article: "das" },
-            { word: "Spiel", article: "das" },
-            { word: "Lied", article: "das" },
-            { word: "Bein", article: "das" },
-            { word: "Auge", article: "das" },
-            { word: "Ohr", article: "das" },
-            { word: "Haar", article: "das" },
-            { word: "Herz", article: "das" },
-            { word: "Gesicht", article: "das" },
-            { word: "Knie", article: "das" },
-            { word: "Geld", article: "das" },
-            { word: "Glück", article: "das" },
-            { word: "Problem", article: "das" },
-            { word: "Thema", article: "das" },
-            { word: "Beispiel", article: "das" },
-            { word: "Hobby", article: "das" },
-            { word: "Hotel", article: "das" },
-            { word: "Restaurant", article: "das" },
-            { word: "Geschäft", article: "das" },
-            { word: "Büro", article: "das" },
-            { word: "Auto", article: "das" },
-            { word: "Fahrrad", article: "das" },
-            { word: "Flugzeug", article: "das" },
-            { word: "Schiff", article: "das" },
-            { word: "Ticket", article: "das" },
-            { word: "Frühstück", article: "das" },
-            { word: "Mittagessen", article: "das" },
-            { word: "Abendessen", article: "das" },
-            { word: "Gespräch", article: "das" },
-            { word: "Wort", article: "das" },
-            { word: "Leben", article: "das" }
-        ];
-        
-        // Button-Event-Listener
-        derBtn.addEventListener('click', () => checkAnswer('der'));
-        dieBtn.addEventListener('click', () => checkAnswer('die'));
-        dasBtn.addEventListener('click', () => checkAnswer('das'));
-        
-        // Beim Laden der Seite
-        window.addEventListener('DOMContentLoaded', init);
-        
-        // App initialisieren
-        function init() {
-            // Stats aus Local Storage laden
-            loadStats();
-            updateStats();
-            
-            // Erstes Wort anzeigen
-            loadNewWord();
-        }
-        
-        // Stats aus Local Storage laden
-        function loadStats() {
-            try {
-                const saved = localStorage.getItem('dddStats');
-                if (saved) {
-                    const data = JSON.parse(saved);
-                    totalCorrect = data.totalCorrect || 0;
-                    history = data.history || [];
-                }
-            } catch (e) {
-                console.log('Fehler beim Laden der Statistiken', e);
-            }
-        }
-        
-        // Neues Wort laden
-        function loadNewWord() {
-            const randomIndex = Math.floor(Math.random() * germanNouns.length);
-            currentWord = germanNouns[randomIndex];
-            wordElement.textContent = currentWord.word;
-            answered = false;
-            
-            // Buttons zurücksetzen
-            derBtn.classList.remove('correct', 'incorrect');
-            dieBtn.classList.remove('correct', 'incorrect');
-            dasBtn.classList.remove('correct', 'incorrect');
-            
-            feedbackElement.textContent = '';
-        }
-        
-        // Antwort prüfen
-        function checkAnswer(article) {
-            if (answered || !currentWord) return;
-            
-            answered = true;
-            const correct = article === currentWord.article;
-            
-            // Button markieren
-            const btn = document.querySelector(`.${article}-btn`);
-            
-            if (correct) {
-                btn.classList.add('correct');
-                feedbackElement.textContent = 'Richtig!';
-                totalCorrect++;
-            } else {
-                btn.classList.add('incorrect');
-                document.querySelector(`.${currentWord.article}-btn`).classList.add('correct');
-                feedbackElement.textContent = `Falsch! Es ist "${currentWord.article} ${currentWord.word}"`;
-            }
-            
-            // Historie aktualisieren
-            history.push(correct);
-            if (history.length > 50) history.shift();
-            
-            // Stats speichern und anzeigen
-            saveStats();
-            updateStats();
-            
-            // Nächstes Wort nach 1,5 Sekunden
-            setTimeout(loadNewWord, 1500);
-        }
-        
-        // Statistik aktualisieren
-        function updateStats() {
-            totalScoreElement.textContent = totalCorrect;
-            
-            const successCount = history.filter(x => x).length;
-            const rate = history.length > 0 ? Math.round((successCount / history.length) * 100) : 0;
-            
-            successRateElement.textContent = rate;
-            successFillElement.style.width = rate + '%';
-        }
-        
-        // Stats speichern
-        function saveStats() {
-            try {
-                localStorage.setItem('dddStats', JSON.stringify({
-                    totalCorrect: totalCorrect,
-                    history: history
-                }));
-            } catch (e) {
-                console.log('Fehler beim Speichern', e);
-            }
-        }
-    </script>
+
+<div class="word-display">
+  <div class="word" id="word">—</div>
+  <button class="ru-btn" id="ru-btn">RU</button>
+</div>
+
+<div class="success-bar"><div class="success-fill" id="success-fill"></div></div>
+<div class="success-text">Erfolgsquote: <span id="success-rate">0</span>%</div>
+
+<div class="article-buttons">
+  <button class="article-btn der-btn" id="der-btn">der</button>
+  <button class="article-btn die-btn" id="die-btn">die</button>
+  <button class="article-btn das-btn" id="das-btn">das</button>
+</div>
+
+<div class="feedback" id="feedback"></div>
+
+<div class="score-box">
+  <div class="score-label">Gesamtpunktzahl</div>
+  <div class="score-value" id="total-score">0</div>
+</div>
+
+<footer>Der Die Das Trainer – übe deutsche Artikel</footer>
+
+<script>
+/* ====================== Wortlisten (≈450) ====================== */
+const germanNouns=[
+ /* --- der --- */
+ {w:"Mann",a:"der"},{w:"Junge",a:"der"},{w:"Vater",a:"der"},{w:"Bruder",a:"der"},{w:"Sohn",a:"der"},
+ {w:"Großvater",a:"der"},{w:"Onkel",a:"der"},{w:"Arzt",a:"der"},{w:"Lehrer",a:"der"},{w:"Student",a:"der"},
+ {w:"Freund",a:"der"},{w:"Nachbar",a:"der"},{w:"Kellner",a:"der"},{w:"Polizist",a:"der"},{w:"Ingenieur",a:"der"},
+ {w:"Tisch",a:"der"},{w:"Stuhl",a:"der"},{w:"Schrank",a:"der"},{w:"Sessel",a:"der"},{w:"Teppich",a:"der"},
+ {w:"Computer",a:"der"},{w:"Bildschirm",a:"der"},{w:"Drucker",a:"der"},{w:"Kühlschrank",a:"der"},{w:"Herd",a:"der"},
+ {w:"Ofen",a:"der"},{w:"Löffel",a:"der"},{w:"Teller",a:"der"},{w:"Kamm",a:"der"},{w:"Spiegel",a:"der"},
+ {w:"Hund",a:"der"},{w:"Vogel",a:"der"},{w:"Fisch",a:"der"},{w:"Tiger",a:"der"},{w:"Elefant",a:"der"},
+ {w:"Baum",a:"der"},{w:"Fluss",a:"der"},{w:"Berg",a:"der"},{w:"See",a:"der"},{w:"Wald",a:"der"},
+ {w:"Tag",a:"der"},{w:"Abend",a:"der"},{w:"Morgen",a:"der"},{w:"Winter",a:"der"},{w:"Sommer",a:"der"},
+ {w:"Frühling",a:"der"},{w:"Herbst",a:"der"},{w:"Regen",a:"der"},{w:"Schnee",a:"der"},{w:"Wind",a:"der"},
+ {w:"Arm",a:"der"},{w:"Fuß",a:"der"},{w:"Kopf",a:"der"},{w:"Mund",a:"der"},{w:"Finger",a:"der"},
+ {w:"Zahn",a:"der"},{w:"Rücken",a:"der"},{w:"Bauch",a:"der"},{w:"Durst",a:"der"},{w:"Hunger",a:"der"},
+ {w:"Stift",a:"der"},{w:"Bleistift",a:"der"},{w:"Kugelschreiber",a:"der"},{w:"Radiergummi",a:"der"},{w:"Ordner",a:"der"},
+ {w:"Kalender",a:"der"},{w:"Brief",a:"der"},{w:"Zug",a:"der"},{w:"Bus",a:"der"},{w:"LKW",a:"der"},
+ {w:"Bahnhof",a:"der"},{w:"Flughafen",a:"der"},{w:"Markt",a:"der"},{w:"Preis",a:"der"},{w:"Euro",a:"der"},
+ {w:"Anzug",a:"der"},{w:"Mantel",a:"der"},{w:"Pullover",a:"der"},{w:"Schuh",a:"der"},{w:"Hut",a:"der"},
+ {w:"Ring",a:"der"},{w:"Schlüssel",a:"der"},{w:"Rucksack",a:"der"},{w:"Schal",a:"der"},{w:"Koffer",a:"der"},
+ {w:"Krieg",a:"der"},{w:"Frieden",a:"der"},{w:"Lärm",a:"der"},{w:"Spaß",a:"der"},{w:"Platz",a:"der"},
+ {w:"Raum",a:"der"},{w:"Gang",a:"der"},{w:"Fehler",a:"der"},{w:"Unfall",a:"der"},{w:"Erfolg",a:"der"},
+
+ /* --- die --- */
+ {w:"Frau",a:"die"},{w:"Mutter",a:"die"},{w:"Schwester",a:"die"},{w:"Tochter",a:"die"},{w:"Großmutter",a:"die"},
+ {w:"Tante",a:"die"},{w:"Freundin",a:"die"},{w:"Nachbarin",a:"die"},{w:"Kellnerin",a:"die"},{w:"Ärztin",a:"die"},
+ {w:"Lehrerin",a:"die"},{w:"Studentin",a:"die"},{w:"Lampe",a:"die"},{w:"Tür",a:"die"},{w:"Fensterbank",a:"die"},
+ {w:"Wand",a:"die"},{w:"Decke",a:"die"},{w:"Treppen",a:"die"},{w:"Küche",a:"die"},{w:"Pfanne",a:"die"},
+ {w:"Gabel",a:"die"},{w:"Tasse",a:"die"},{w:"Flasche",a:"die"},{w:"Schüssel",a:"die"},{w:"Waschmaschine",a:"die"},
+ {w:"Tastatur",a:"die"},{w:"Maus",a:"die"},{w:"Kamera",a:"die"},{w:"Brille",a:"die"},{w:"Uhr",a:"die"},
+ {w:"Kette",a:"die"},{w:"Mütze",a:"die"},{w:"Jacke",a:"die"},{w:"Hose",a:"die"},{w:"Socke",a:"die"},
+ {w:"Bluse",a:"die"},{w:"Handtasche",a:"die"},{w:"Straße",a:"die"},{w:"Brücke",a:"die"},{w:"Stadt",a:"die"},
+ {w:"Hauptstadt",a:"die"},{w:"Wohnung",a:"die"},{w:"Adresse",a:"die"},{w:"Post",a:"die"},{w:"Polizei",a:"die"},
+ {w:"Bank",a:"die"},{w:"Apotheke",a:"die"},{w:"Schule",a:"die"},{w:"Universität",a:"die"},{w:"Bibliothek",a:"die"},
+ {w:"Firma",a:"die"},{w:"Arbeit",a:"die"},{w:"Prüfung",a:"die"},{w:"Frage",a:"die"},{w:"Antwort",a:"die"},
+ {w:"Idee",a:"die"},{w:"Zeitung",a:"die"},{w:"Sprache",a:"die"},{w:"Lektion",a:"die"},{w:"Geschichte",a:"die"},
+ {w:"Musik",a:"die"},{w:"Kunst",a:"die"},{w:"Natur",a:"die"},{w:"Luft",a:"die"},{w:"Erde",a:"die"},
+ {w:"Sonne",a:"die"},{w:"Wolke",a:"die"},{w:"Wüste",a:"die"},{w:"Insel",a:"die"},{w:"Zeit",a:"die"},
+ {w:"Stunde",a:"die"},{w:"Minute",a:"die"},{w:"Sekunde",a:"die"},{w:"Woche",a:"die"},{w:"Nacht",a:"die"},
+ {w:"Reise",a:"die"},{w:"Feier",a:"die"},{w:"Party",a:"die"},{w:"Hochzeit",a:"die"},{w:"Geburt",a:"die"},
+ {w:"Gesundheit",a:"die"},{w:"Krankheit",a:"die"},{w:"Medizin",a:"die"},{w:"Diät",a:"die"},{w:"Erholung",a:"die"},
+ {w:"Email",a:"die"},{w:"Nachricht",a:"die"},{w:"Batterie",a:"die"},{w:"Karte",a:"die"},{w:"Rechnung",a:"die"},
+
+ /* --- das --- */
+ {w:"Kind",a:"das"},{w:"Baby",a:"das"},{w:"Mädchen",a:"das"},{w:"Haus",a:"das"},{w:"Zimmer",a:"das"},
+ {w:"Wohnzimmer",a:"das"},{w:"Schlafzimmer",a:"das"},{w:"Badezimmer",a:"das"},{w:"Bett",a:"das"},{w:"Sofa",a:"das"},
+ {w:"Regal",a:"das"},{w:"Fenster",a:"das"},{w:"Dach",a:"das"},{w:"Bild",a:"das"},{w:"Foto",a:"das"},
+ {w:"Handy",a:"das"},{w:"Telefon",a:"das"},{w:"Radio",a:"das"},{w:"Tablet",a:"das"},{w:"Ladegerät",a:"das"},
+ {w:"Buch",a:"das"},{w:"Heft",a:"das"},{w:"Papier",a:"das"},{w:"Wörterbuch",a:"das"},{w:"Spiel",a:"das"},
+ {w:"Lied",a:"das"},{w:"Instrument",a:"das"},{w:"Orchester",a:"das"},{w:"Konzert",a:"das"},{w:"Ticket",a:"das"},
+ {w:"Auto",a:"das"},{w:"Fahrrad",a:"das"},{w:"Motorrad",a:"das"},{w:"Flugzeug",a:"das"},{w:"Schiff",a:"das"},
+ {w:"Boot",a:"das"},{w:"Taxi",a:"das"},{w:"Pferd",a:"das"},{w:"Schaf",a:"das"},{w:"Rind",a:"das"},
+ {w:"Land",a:"das"},{w:"Meer",a:"das"},{w:"Wasser",a:"das"},{w:"Feuer",a:"das"},{w:"Eis",a:"das"},
+ {w:"Frühstück",a:"das"},{w:"Mittagessen",a:"das"},{w:"Abendessen",a:"das"},{w:"Brot",a:"das"},{w:"Ei",a:"das"},
+ {w:"Fleisch",a:"das"},{w:"Gemüse",a:"das"},{w:"Obst",a:"das"},{w:"Salz",a:"das"},{w:"Öl",a:"das"},
+ {w:"Problem",a:"das"},{w:"Thema",a:"das"},{w:"Beispiel",a:"das"},{w:"Projekt",a:"das"},{w:"Ergebnis",a:"das"},
+ {w:"Gespräch",a:"das"},{w:"Wort",a:"das"},{w:"Leben",a:"das"},{w:"Jahr",a:"das"},{w:"Datum",a:"das"},
+ {w:"Bildschirmfoto",a:"das"},{w:"Glas",a:"das"},{w:"Messer",a:"das"},{w:"Armband",a:"das"},{w:"Hemd",a:"das"},
+ {w:"T-Shirt",a:"das"},{w:"Kleid",a:"das"},{w:"Bein",a:"das"},{w:"Auge",a:"das"},{w:"Ohr",a:"das"},
+ {w:"Gesicht",a:"das"},{w:"Haar",a:"das"},{w:"Herz",a:"das"},{w:"Knie",a:"das"},{w:"Blut",a:"das"},
+ {w:"Gewitter",a:"das"},{w:"Wetter",a:"das"},{w:"Licht",a:"das"},{w:"Bildnis",a:"das"},{w:"Gedicht",a:"das"}
+];
+
+/* ===================== Russisches Wörterbuch ===================== */
+const ru={
+"Mann":"мужчина","Junge":"мальчик","Vater":"отец","Bruder":"брат","Sohn":"сын","Großvater":"дедушка","Onkel":"дядя",
+"Arzt":"врач","Lehrer":"учитель","Student":"студент","Freund":"друг","Nachbar":"сосед","Kellner":"официант",
+"Polizist":"полицейский","Ingenieur":"инженер","Tisch":"стол","Stuhl":"стул","Schrank":"шкаф","Sessel":"кресло",
+"Teppich":"ковёр","Computer":"компьютер","Bildschirm":"монитор","Drucker":"принтер","Kühlschrank":"холодильник",
+"Herd":"плита","Ofen":"духовка","Löffel":"ложка","Teller":"тарелка","Kamm":"расчёска","Spiegel":"зеркало",
+"Hund":"собака","Vogel":"птица","Fisch":"рыба","Tiger":"тигр","Elefant":"слон","Baum":"дерево","Fluss":"река",
+"Berg":"гора","See":"озеро","Wald":"лес","Tag":"день","Abend":"вечер","Morgen":"утро","Winter":"зима","Sommer":"лето",
+"Frühling":"весна","Herbst":"осень","Regen":"дождь","Schnee":"снег","Wind":"ветер","Arm":"рука","Fuß":"нога",
+"Kopf":"голова","Mund":"рот","Finger":"палец","Zahn":"зуб","Rücken":"спина","Bauch":"живот","Durst":"жажда",
+"Hunger":"голод","Stift":"ручка","Bleistift":"карандаш","Kugelschreiber":"шариковая_ручка",
+"Radiergummi":"ластик","Ordner":"папка","Kalender":"календарь","Brief":"письмо","Zug":"поезд","Bus":"автобус",
+"LKW":"грузовик","Bahnhof":"вокзал","Flughafen":"аэропорт","Markt":"рынок","Preis":"цена","Euro":"евро",
+"Anzug":"костюм","Mantel":"пальто","Pullover":"свитер","Schuh":"ботинок","Hut":"шляпа","Ring":"кольцо",
+"Schlüssel":"ключ","Rucksack":"рюкзак","Schal":"шарф","Koffer":"чемодан","Krieg":"война","Frieden":"мир",
+"Lärm":"шум","Spaß":"веселье","Platz":"площадь","Raum":"пространство","Gang":"коридор","Fehler":"ошибка",
+"Unfall":"авария","Erfolg":"успех",
+
+"Frau":"женщина","Mutter":"мать","Schwester":"сестра","Tochter":"дочь","Großmutter":"бабушка","Tante":"тётя",
+"Freundin":"подруга","Nachbarin":"соседка","Kellnerin":"официантка","Ärztin":"врач","Lehrerin":"учительница",
+"Studentin":"студентка","Lampe":"лампа","Tür":"дверь","Fensterbank":"подоконник","Wand":"стена","Decke":"потолок",
+"Treppen":"лестница","Küche":"кухня","Pfanne":"сковорода","Gabel":"вилка","Tasse":"чашка","Flasche":"бутылка",
+"Schüssel":"миска","Waschmaschine":"стиральная_машина","Tastatur":"клавиатура","Maus":"мышь","Kamera":"камера",
+"Brille":"очки","Uhr":"часы","Kette":"цепочка","Mütze":"шапка","Jacke":"куртка","Hose":"брюки","Socke":"носк",
+"Bluse":"блузка","Handtasche":"сумочка","Straße":"улица","Brücke":"мост","Stadt":"город","Hauptstadt":"столица",
+"Wohnung":"квартира","Adresse":"адрес","Post":"почта","Polizei":"полиция","Bank":"банк","Apotheke":"аптека",
+"Schule":"школа","Universität":"университет","Bibliothek":"библиотека","Firma":"фирма","Arbeit":"работа",
+"Prüfung":"экзамен","Frage":"вопрос","Antwort":"ответ","Idee":"идея","Zeitung":"газета","Sprache":"язык",
+"Lektion":"урок","Geschichte":"история","Musik":"музыка","Kunst":"искусство","Natur":"природа","Luft":"воздух",
+"Erde":"земля","Sonne":"солнце","Wolke":"облако","Wüste":"пустыня","Insel":"остров","Zeit":"время","Stunde":"час",
+"Minute":"минута","Sekunde":"секунда","Woche":"неделя","Nacht":"ночь","Reise":"путешествие","Feier":"праздник",
+"Party":"вечеринка","Hochzeit":"свадьба","Geburt":"рождение","Gesundheit":"здоровье","Krankheit":"болезнь",
+"Medizin":"медицина","Diät":"диета","Erholung":"отдых","Email":"электронная_почта","Nachricht":"сообщение",
+"Batterie":"батарея","Karte":"карта","Rechnung":"счёт",
+
+"Kind":"ребёнок","Baby":"малыш","Mädchen":"девочка","Haus":"дом","Zimmer":"комната","Wohnzimmer":"гостиная",
+"Schlafzimmer":"спальня","Badezimmer":"ванная","Bett":"кровать","Sofa":"диван","Regal":"полка","Fenster":"окно",
+"Dach":"крыша","Bild":"картина","Foto":"фото","Handy":"мобильник","Telefon":"телефон","Radio":"радио",
+"Tablet":"планшет","Ladegerät":"зарядное_устройство","Buch":"книга","Heft":"тетрадь","Papier":"бумага",
+"Wörterbuch":"словарь","Spiel":"игра","Lied":"песня","Instrument":"инструмент","Orchester":"оркестр",
+"Konzert":"концерт","Ticket":"билет","Auto":"автомобиль","Fahrrad":"велосипед","Motorrad":"мотоцикл",
+"Flugzeug":"самолёт","Schiff":"корабль","Boot":"лодка","Taxi":"такси","Pferd":"лошадь","Schaf":"овца",
+"Rind":"крупный_рогатый_скот","Land":"страна","Meer":"море","Wasser":"вода","Feuer":"огонь","Eis":"лёд",
+"Frühstück":"завтрак","Mittagessen":"обед","Abendessen":"ужин","Brot":"хлеб","Ei":"яйцо","Fleisch":"мясо",
+"Gemüse":"овощи","Obst":"фрукты","Salz":"соль","Öl":"масло","Problem":"проблема","Thema":"тема",
+"Beispiel":"пример","Projekt":"проект","Ergebnis":"результат","Gespräch":"разговор","Wort":"слово",
+"Leben":"жизнь","Jahr":"год","Datum":"дата","Bildschirmfoto":"скриншот","Glas":"стакан","Messer":"нож",
+"Armband":"браслет","Hemd":"рубашка","T-Shirt":"футболка","Kleid":"платье","Bein":"нога","Auge":"глаз",
+"Ohr":"ухо","Gesicht":"лицо","Haar":"волос","Herz":"сердце","Knie":"колено","Blut":"кровь",
+"Gewitter":"гроза","Wetter":"погода","Licht":"свет","Bildnis":"образ","Gedicht":"стихотворение"
+};
+
+/* ========================= Status & DOM ========================== */
+let current=null,answered=false,totalCorrect=0,history=[];
+const wordEl=document.getElementById("word"),
+      feedbackEl=document.getElementById("feedback"),
+      totalScoreEl=document.getElementById("total-score"),
+      successRateEl=document.getElementById("success-rate"),
+      successFillEl=document.getElementById("success-fill"),
+      derBtn=document.getElementById("der-btn"),
+      dieBtn=document.getElementById("die-btn"),
+      dasBtn=document.getElementById("das-btn"),
+      ruBtn=document.getElementById("ru-btn");
+
+/* ============================ Events ============================= */
+derBtn.addEventListener("click",()=>check("der"));
+dieBtn.addEventListener("click",()=>check("die"));
+dasBtn.addEventListener("click",()=>check("das"));
+["mousedown","touchstart"].forEach(ev=>ruBtn.addEventListener(ev,showRu));
+["mouseup","mouseleave","touchend","touchcancel"].forEach(ev=>ruBtn.addEventListener(ev,hideRu));
+window.addEventListener("DOMContentLoaded",init);
+
+/* ============================ Logic ============================== */
+function init(){
+  loadStats();
+  updateStats();
+  nextWord();
+}
+function loadStats(){
+  try{
+    const d=JSON.parse(localStorage.getItem("dddStats")||"null");
+    if(d){totalCorrect=d.totalCorrect||0;history=d.history||[]}
+  }catch{}
+}
+function saveStats(){
+  try{
+    localStorage.setItem("dddStats",JSON.stringify({totalCorrect,history}));
+  }catch{}
+}
+function nextWord(){
+  current=germanNouns[Math.floor(Math.random()*germanNouns.length)];
+  wordEl.textContent=current.w;
+  answered=false;
+  [derBtn,dieBtn,dasBtn].forEach(b=>b.classList.remove("correct","incorrect"));
+  feedbackEl.textContent="";
+}
+function check(art){
+  if(answered)return;
+  answered=true;
+  const ok=art===current.a;
+  document.querySelector(`.${art}-btn`).classList.add(ok?"correct":"incorrect");
+  if(!ok)document.querySelector(`.${current.a}-btn`).classList.add("correct");
+  feedbackEl.textContent=ok?"Richtig!":`Falsch – ${current.a} ${current.w}`;
+  if(ok)totalCorrect++;
+  history.push(ok); if(history.length>50)history.shift();
+  saveStats(); updateStats();
+  setTimeout(nextWord,1500);
+}
+function updateStats(){
+  totalScoreEl.textContent=totalCorrect;
+  const ok=history.filter(Boolean).length,rate=history.length?Math.round(ok/history.length*100):0;
+  successRateEl.textContent=rate; successFillEl.style.width=rate+"%";
+}
+function showRu(e){
+  wordEl.textContent=ru[current.w]||"—";
+  e.preventDefault();
+}
+function hideRu(){
+  wordEl.textContent=current.w;
+}
+</script>
 </body>
 </html>
