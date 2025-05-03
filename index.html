@@ -1,276 +1,38 @@
-<!-- index.html – alles in EINER Datei: Manifest, Service-Worker, komplette Wort- und Übersetzungslisten -->
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Der Die Das Trainer</title>
-
-<style>
-:root{
- --background-color:#fff;
- --container-color:#f9f9f9;
- --text-color:#777;
- --highlight-green:#d7f8e8;
- --highlight-red:#ffdfdf;
- --der-color:#b8d0ff;
- --die-color:#ffcfe9;
- --das-color:#d0ffdb;
-}
-*{box-sizing:border-box;margin:0;padding:0;font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif}
-body{background:var(--background-color);color:var(--text-color);padding:20px;max-width:600px;margin:0 auto;line-height:1.5}
-.word-display{background:var(--container-color);padding:35px;border-radius:15px;margin-bottom:30px;text-align:center;box-shadow:0 3px 15px rgba(0,0,0,.05);position:relative}
-.word{font-size:3rem;color:#444;font-weight:600;min-height:3.2rem}
-.ru-btn{position:absolute;right:15px;bottom:15px;width:46px;height:46px;border-radius:50%;border:none;background:#d0d0d0;color:#444;font-weight:600;cursor:pointer}
-.ru-btn:active{transform:scale(.95)}
-.success-bar{height:12px;background:#eee;border-radius:6px;margin-bottom:8px;overflow:hidden}
-.success-fill{height:100%;background:var(--highlight-green);border-radius:6px;width:0;transition:width .5s}
-.success-text{text-align:center;font-size:.9rem;margin-bottom:30px;color:#888}
-.article-buttons{display:flex;gap:15px;margin-bottom:25px}
-.article-btn{flex:1;padding:20px 15px;font-size:1.8rem;border:none;border-radius:12px;background:#fff;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.05);transition:all .3s}
-.article-btn:hover{transform:translateY(-3px);box-shadow:0 5px 15px rgba(0,0,0,.1)}
-.der-btn{border-bottom:5px solid var(--der-color);color:#555}
-.die-btn{border-bottom:5px solid var(--die-color);color:#555}
-.das-btn{border-bottom:5px solid var(--das-color);color:#555}
-.correct{background:var(--highlight-green)}
-.incorrect{background:var(--highlight-red)}
-.feedback{text-align:center;font-size:1.3rem;min-height:35px;margin-bottom:30px;font-weight:500;color:#555}
-.score-box{background:var(--container-color);padding:20px;border-radius:15px;text-align:center;box-shadow:0 3px 15px rgba(0,0,0,.05)}
-.score-label{font-size:1rem;color:#888;margin-bottom:8px}
-.score-value{font-size:2.5rem;font-weight:600;color:#444}
-footer{text-align:center;margin-top:40px;padding:20px;font-size:.8rem;color:#aaa}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Der Die Das Trainer</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <div class="word-display">
+    <div class="word" id="word">—</div>
+    <div class="translation" id="translation">—</div>
+    <button class="ru-btn" id="ru-btn">RU</button>
+  </div>
 
-<div class="word-display">
-  <div class="word" id="word">—</div>
-  <button class="ru-btn" id="ru-btn">RU</button>
-</div>
+  <div class="success-bar"><div class="success-fill" id="success-fill"></div></div>
+  <div class="success-text">Erfolgsquote: <span id="success-rate">0</span>%</div>
 
-<div class="success-bar"><div class="success-fill" id="success-fill"></div></div>
-<div class="success-text">Erfolgsquote: <span id="success-rate">0</span>%</div>
+  <div class="article-buttons">
+    <button class="article-btn der-btn" id="der-btn">der</button>
+    <button class="article-btn die-btn" id="die-btn">die</button>
+    <button class="article-btn das-btn" id="das-btn">das</button>
+  </div>
 
-<div class="article-buttons">
-  <button class="article-btn der-btn" id="der-btn">der</button>
-  <button class="article-btn die-btn" id="die-btn">die</button>
-  <button class="article-btn das-btn" id="das-btn">das</button>
-</div>
+  <div class="feedback" id="feedback"></div>
 
-<div class="feedback" id="feedback"></div>
+  <div class="score-box">
+    <div class="score-label">Gesamtpunktzahl</div>
+    <div class="score-value" id="total-score">0</div>
+  </div>
 
-<div class="score-box">
-  <div class="score-label">Gesamtpunktzahl</div>
-  <div class="score-value" id="total-score">0</div>
-</div>
+  <footer>Der Die Das Trainer – übe deutsche Artikel</footer>
 
-<footer>Der Die Das Trainer – übe deutsche Artikel</footer>
-
-<script>
-/* ================= 0. Manifest & Service-Worker inline ================ */
-(()=>{
-  const icon="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAF0lEQVR42mNgGP7/PwMDAwMjI2BgYAAAAAIAAAGhDQvTAAAAABJRU5ErkJggg==";
-  const manifest={
-    name:"Der Die Das Trainer",
-    short_name:"DDD Trainer",
-    start_url:".",
-    display:"standalone",
-    background_color:"#ffffff",
-    theme_color:"#ffffff",
-    icons:[{src:icon,sizes:"192x192",type:"image/png"},
-           {src:icon,sizes:"512x512",type:"image/png"}]
-  };
-  const manifestURL=URL.createObjectURL(new Blob([JSON.stringify(manifest)],{type:"application/json"}));
-  const link=document.createElement("link");link.rel="manifest";link.href=manifestURL;document.head.appendChild(link);
-
-  if("serviceWorker" in navigator){
-    const sw=`
-      const CACHE="ddd-cache-v1";
-      self.addEventListener("install",e=>{
-        e.waitUntil(caches.open(CACHE).then(c=>c.addAll(["./"])));
-        self.skipWaiting();
-      });
-      self.addEventListener("activate",e=>{
-        e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));
-        self.clients.claim();
-      });
-      self.addEventListener("fetch",e=>{
-        e.respondWith(caches.match(e.request,{ignoreSearch:true}).then(r=>r||fetch(e.request)));
-      });
-      self.addEventListener("push",e=>{
-        const d=e.data?e.data.json():{title:"Trainer",body:"Zeit zum Üben!"};
-        self.registration.showNotification(d.title,{body:d.body,icon:"${icon}"});
-      });
-    `;
-    const swURL=URL.createObjectURL(new Blob([sw],{type:"application/javascript"}));
-    navigator.serviceWorker.register(swURL);
-  }
-  if("Notification" in window && Notification.permission==="default"){Notification.requestPermission();}
-})();
-
-/* ================= 1. Wortliste (≈450 Grundwörter) =================== */
-const germanNouns=[
-// ---------- der ----------
-{w:"Mann",a:"der"},{w:"Junge",a:"der"},{w:"Vater",a:"der"},{w:"Bruder",a:"der"},{w:"Sohn",a:"der"},
-{w:"Großvater",a:"der"},{w:"Onkel",a:"der"},{w:"Arzt",a:"der"},{w:"Lehrer",a:"der"},{w:"Student",a:"der"},
-{w:"Freund",a:"der"},{w:"Nachbar",a:"der"},{w:"Kellner",a:"der"},{w:"Polizist",a:"der"},{w:"Ingenieur",a:"der"},
-{w:"Tisch",a:"der"},{w:"Stuhl",a:"der"},{w:"Schrank",a:"der"},{w:"Sessel",a:"der"},{w:"Teppich",a:"der"},
-{w:"Computer",a:"der"},{w:"Bildschirm",a:"der"},{w:"Drucker",a:"der"},{w:"Kühlschrank",a:"der"},{w:"Herd",a:"der"},
-{w:"Ofen",a:"der"},{w:"Löffel",a:"der"},{w:"Teller",a:"der"},{w:"Kamm",a:"der"},{w:"Spiegel",a:"der"},
-{w:"Hund",a:"der"},{w:"Vogel",a:"der"},{w:"Fisch",a:"der"},{w:"Tiger",a:"der"},{w:"Elefant",a:"der"},
-{w:"Baum",a:"der"},{w:"Fluss",a:"der"},{w:"Berg",a:"der"},{w:"See",a:"der"},{w:"Wald",a:"der"},
-{w:"Tag",a:"der"},{w:"Abend",a:"der"},{w:"Morgen",a:"der"},{w:"Winter",a:"der"},{w:"Sommer",a:"der"},
-{w:"Frühling",a:"der"},{w:"Herbst",a:"der"},{w:"Regen",a:"der"},{w:"Schnee",a:"der"},{w:"Wind",a:"der"},
-{w:"Arm",a:"der"},{w:"Fuß",a:"der"},{w:"Kopf",a:"der"},{w:"Mund",a:"der"},{w:"Finger",a:"der"},
-{w:"Zahn",a:"der"},{w:"Rücken",a:"der"},{w:"Bauch",a:"der"},{w:"Durst",a:"der"},{w:"Hunger",a:"der"},
-{w:"Stift",a:"der"},{w:"Bleistift",a:"der"},{w:"Kugelschreiber",a:"der"},{w:"Radiergummi",a:"der"},{w:"Ordner",a:"der"},
-{w:"Kalender",a:"der"},{w:"Brief",a:"der"},{w:"Zug",a:"der"},{w:"Bus",a:"der"},{w:"LKW",a:"der"},
-{w:"Bahnhof",a:"der"},{w:"Flughafen",a:"der"},{w:"Markt",a:"der"},{w:"Preis",a:"der"},{w:"Euro",a:"der"},
-{w:"Anzug",a:"der"},{w:"Mantel",a:"der"},{w:"Pullover",a:"der"},{w:"Schuh",a:"der"},{w:"Hut",a:"der"},
-{w:"Ring",a:"der"},{w:"Schlüssel",a:"der"},{w:"Rucksack",a:"der"},{w:"Schal",a:"der"},{w:"Koffer",a:"der"},
-{w:"Krieg",a:"der"},{w:"Frieden",a:"der"},{w:"Lärm",a:"der"},{w:"Spaß",a:"der"},{w:"Platz",a:"der"},
-{w:"Raum",a:"der"},{w:"Gang",a:"der"},{w:"Fehler",a:"der"},{w:"Unfall",a:"der"},{w:"Erfolg",a:"der"},
-// ---------- die ----------
-{w:"Frau",a:"die"},{w:"Mutter",a:"die"},{w:"Schwester",a:"die"},{w:"Tochter",a:"die"},{w:"Großmutter",a:"die"},
-{w:"Tante",a:"die"},{w:"Freundin",a:"die"},{w:"Nachbarin",a:"die"},{w:"Kellnerin",a:"die"},{w:"Ärztin",a:"die"},
-{w:"Lehrerin",a:"die"},{w:"Studentin",a:"die"},{w:"Lampe",a:"die"},{w:"Tür",a:"die"},{w:"Fensterbank",a:"die"},
-{w:"Wand",a:"die"},{w:"Decke",a:"die"},{w:"Treppen",a:"die"},{w:"Küche",a:"die"},{w:"Pfanne",a:"die"},
-{w:"Gabel",a:"die"},{w:"Tasse",a:"die"},{w:"Flasche",a:"die"},{w:"Schüssel",a:"die"},{w:"Waschmaschine",a:"die"},
-{w:"Tastatur",a:"die"},{w:"Maus",a:"die"},{w:"Kamera",a:"die"},{w:"Brille",a:"die"},{w:"Uhr",a:"die"},
-{w:"Kette",a:"die"},{w:"Mütze",a:"die"},{w:"Jacke",a:"die"},{w:"Hose",a:"die"},{w:"Socke",a:"die"},
-{w:"Bluse",a:"die"},{w:"Handtasche",a:"die"},{w:"Straße",a:"die"},{w:"Brücke",a:"die"},{w:"Stadt",a:"die"},
-{w:"Hauptstadt",a:"die"},{w:"Wohnung",a:"die"},{w:"Adresse",a:"die"},{w:"Post",a:"die"},{w:"Polizei",a:"die"},
-{w:"Bank",a:"die"},{w:"Apotheke",a:"die"},{w:"Schule",a:"die"},{w:"Universität",a:"die"},{w:"Bibliothek",a:"die"},
-{w:"Firma",a:"die"},{w:"Arbeit",a:"die"},{w:"Prüfung",a:"die"},{w:"Frage",a:"die"},{w:"Antwort",a:"die"},
-{w:"Idee",a:"die"},{w:"Zeitung",a:"die"},{w:"Sprache",a:"die"},{w:"Lektion",a:"die"},{w:"Geschichte",a:"die"},
-{w:"Musik",a:"die"},{w:"Kunst",a:"die"},{w:"Natur",a:"die"},{w:"Luft",a:"die"},{w:"Erde",a:"die"},
-{w:"Sonne",a:"die"},{w:"Wolke",a:"die"},{w:"Wüste",a:"die"},{w:"Insel",a:"die"},{w:"Zeit",a:"die"},
-{w:"Stunde",a:"die"},{w:"Minute",a:"die"},{w:"Sekunde",a:"die"},{w:"Woche",a:"die"},{w:"Nacht",a:"die"},
-{w:"Reise",a:"die"},{w:"Feier",a:"die"},{w:"Party",a:"die"},{w:"Hochzeit",a:"die"},{w:"Geburt",a:"die"},
-{w:"Gesundheit",a:"die"},{w:"Krankheit",a:"die"},{w:"Medizin",a:"die"},{w:"Diät",a:"die"},{w:"Erholung",a:"die"},
-{w:"Email",a:"die"},{w:"Nachricht",a:"die"},{w:"Batterie",a:"die"},{w:"Karte",a:"die"},{w:"Rechnung",a:"die"},
-// ---------- das ----------
-{w:"Kind",a:"das"},{w:"Baby",a:"das"},{w:"Mädchen",a:"das"},{w:"Haus",a:"das"},{w:"Zimmer",a:"das"},
-{w:"Wohnzimmer",a:"das"},{w:"Schlafzimmer",a:"das"},{w:"Badezimmer",a:"das"},{w:"Bett",a:"das"},{w:"Sofa",a:"das"},
-{w:"Regal",a:"das"},{w:"Fenster",a:"das"},{w:"Dach",a:"das"},{w:"Bild",a:"das"},{w:"Foto",a:"das"},
-{w:"Handy",a:"das"},{w:"Telefon",a:"das"},{w:"Radio",a:"das"},{w:"Tablet",a:"das"},{w:"Ladegerät",a:"das"},
-{w:"Buch",a:"das"},{w:"Heft",a:"das"},{w:"Papier",a:"das"},{w:"Wörterbuch",a:"das"},{w:"Spiel",a:"das"},
-{w:"Lied",a:"das"},{w:"Instrument",a:"das"},{w:"Orchester",a:"das"},{w:"Konzert",a:"das"},{w:"Ticket",a:"das"},
-{w:"Auto",a:"das"},{w:"Fahrrad",a:"das"},{w:"Motorrad",a:"das"},{w:"Flugzeug",a:"das"},{w:"Schiff",a:"das"},
-{w:"Boot",a:"das"},{w:"Taxi",a:"das"},{w:"Pferd",a:"das"},{w:"Schaf",a:"das"},{w:"Rind",a:"das"},
-{w:"Land",a:"das"},{w:"Meer",a:"das"},{w:"Wasser",a:"das"},{w:"Feuer",a:"das"},{w:"Eis",a:"das"},
-{w:"Frühstück",a:"das"},{w:"Mittagessen",a:"das"},{w:"Abendessen",a:"das"},{w:"Brot",a:"das"},{w:"Ei",a:"das"},
-{w:"Fleisch",a:"das"},{w:"Gemüse",a:"das"},{w:"Obst",a:"das"},{w:"Salz",a:"das"},{w:"Öl",a:"das"},
-{w:"Problem",a:"das"},{w:"Thema",a:"das"},{w:"Beispiel",a:"das"},{w:"Projekt",a:"das"},{w:"Ergebnis",a:"das"},
-{w:"Gespräch",a:"das"},{w:"Wort",a:"das"},{w:"Leben",a:"das"},{w:"Jahr",a:"das"},{w:"Datum",a:"das"},
-{w:"Bildschirmfoto",a:"das"},{w:"Glas",a:"das"},{w:"Messer",a:"das"},{w:"Armband",a:"das"},{w:"Hemd",a:"das"},
-{w:"T-Shirt",a:"das"},{w:"Kleid",a:"das"},{w:"Bein",a:"das"},{w:"Auge",a:"das"},{w:"Ohr",a:"das"},
-{w:"Gesicht",a:"das"},{w:"Haar",a:"das"},{w:"Herz",a:"das"},{w:"Knie",a:"das"},{w:"Blut",a:"das"},
-{w:"Gewitter",a:"das"},{w:"Wetter",a:"das"},{w:"Licht",a:"das"},{w:"Bildnis",a:"das"},{w:"Gedicht",a:"das"}
-];
-
-/* ================= 2. Russische Übersetzungen ====================== */
-const ru={
-"Abend":"вечер","Abendessen":"ужин","Adresse":"адрес","Apotheke":"аптека","Apfel":"яблоко","Arbeit":"работа",
-"Armband":"браслет","Arzt":"врач","Auto":"автомобиль","Baby":"малыш","Bahnhof":"вокзал","Bank":"банк",
-"Bauch":"живот","Baum":"дерево","Bein":"нога","Beispiel":"пример","Berg":"гора","Beruf":"профессия",
-"Bild":"картина","Bildnis":"образ","Bildschirm":"монитор","Bildschirmfoto":"скриншот","Blume":"цветок",
-"Blut":"кровь","Boot":"лодка","Bratpfanne":"сковорода","Brief":"письмо","Brille":"очки","Brücke":"мост",
-"Bruder":"брат","Buch":"книга","Bus":"автобус","Computer":"компьютер","Datum":"дата","Decke":"потолок",
-"Diät":"диета","Doktor":"врач","Durst":"жажда","Ei":"яйцо","Elefant":"слон","Email":"электронная почта",
-"Erde":"земля","Erfolg":"успех","Ergebnis":"результат","Erholung":"отдых","Euro":"евро","Fahrrad":"велосипед",
-"Feier":"праздник","Fehler":"ошибка","Feuer":"огонь","Fisch":"рыба","Flasche":"бутылка","Flughafen":"аэропорт",
-"Flugzeug":"самолёт","Foto":"фото","Freund":"друг","Freundin":"подруга","Frühling":"весна","Frühstück":"завтрак",
-"Frage":"вопрос","Frau":"женщина","Frieden":"мир","Fuß":"нога","Gang":"коридор","Gabel":"вилка",
-"Geburt":"рождение","Gedicht":"стихотворение","Gemüse":"овощи","Gesicht":"лицо","Gespräch":"разговор",
-"Gesundheit":"здоровье","Gewitter":"гроза","Glas":"стакан","Großmutter":"бабушка","Großvater":"дедушка",
-"Haus":"дом","Haut":"кожа","Hemd":"рубашка","Herbst":"осень","Herz":"сердце","Hund":"собака",
-"Hunger":"голод","Hut":"шляпа","Idee":"идея","Ingenieur":"инженер","Insel":"остров","Jacke":"куртка",
-"Jahr":"год","Junge":"мальчик","Kalender":"календарь","Kamera":"камера","Karte":"карта","Kellner":"официант",
-"Kellnerin":"официантка","Kette":"цепочка","Knie":"колено","Koffer":"чемодан","Kopf":"голова",
-"Krankheit":"болезнь","Krieg":"война","Kühlschrank":"холодильник","Kugelschreiber":"ручка","Kunst":"искусство",
-"Ladegerät":"зарядка","Lampe":"лампа","Land":"страна","Lärm":"шум","Lektion":"урок","Lehrer":"учитель",
-"Licht":"свет","Lied":"песня","Löffel":"ложка","Luft":"воздух","Mädchen":"девочка","Mantel":"пальто",
-"Markt":"рынок","Maus":"мышь","Meer":"море","Medizin":"медицина","Messer":"нож","Minute":"минута",
-"Motorrad":"мотоцикл","Mutter":"мать","Nacht":"ночь","Nachbar":"сосед","Nachbarin":"соседка",
-"Nachricht":"сообщение","Natur":"природа","Onkel":"дядя","Ordner":"папка","Ohr":"ухо","Papier":"бумага",
-"Party":"вечеринка","Pfanne":"сковорода","Pferd":"лошадь","Polizei":"полиция","Polizist":"полицейский",
-"Preis":"цена","Problem":"проблема","Projekt":"проект","Prüfung":"экзамен","Pullover":"свитер",
-"Radio":"радио","Radiergummi":"ластик","Rechnung":"счёт","Regen":"дождь","Reise":"путешествие",
-"Ring":"кольцо","Rind":"корова","Rucksack":"рюкзак","Salat":"салат","Salz":"соль","Schaf":"овца",
-"Schal":"шарф","Schiff":"корабль","Schlüssel":"ключ","Schnee":"снег","Schrank":"шкаф","Schuh":"ботинок",
-"Schule":"школа","Schwester":"сестра","Seele":"душа","See":"озеро","Sekunde":"секунда","Sessel":"кресло",
-"Sommer":"лето","Sonne":"солнце","Spaß":"веселье","Spiegel":"зеркало","Spiel":"игра","Sprache":"язык",
-"Stadt":"город","Stift":"карандаш","Straße":"улица","Student":"студент","Studentin":"студентка",
-"Stuhl":"стул","Tag":"день","Taxi":"такси","Tee":"чай","Telefon":"телефон","Teller":"тарелка",
-"Thema":"тема","Tiger":"тигр","Tisch":"стол","Tochter":"дочь","Tomate":"помидор","Topf":"кастрюля",
-"Treppen":"лестница","Tür":"дверь","Uhr":"часы","Universität":"университет","Urlaub":"отпуск",
-"Vater":"отец","Vogel":"птица","Wand":"стена","Wasser":"вода","Wein":"вино","Wetter":"погода",
-"Winter":"зима","Woche":"неделя","Wohnung":"квартира","Wolke":"облако","Wohnzimmer":"гостиная",
-"Wörterbuch":"словарь","Wüste":"пустыня","Zeit":"время","Zeitung":"газета","Zug":"поезд"
-};
-
-/* ================= 3. Status & DOM-Referenzen ====================== */
-let current=null,answered=false,totalCorrect=0,history=[];
-const wordEl=document.getElementById("word"),
-      feedbackEl=document.getElementById("feedback"),
-      totalScoreEl=document.getElementById("total-score"),
-      successRateEl=document.getElementById("success-rate"),
-      successFillEl=document.getElementById("success-fill"),
-      derBtn=document.getElementById("der-btn"),
-      dieBtn=document.getElementById("die-btn"),
-      dasBtn=document.getElementById("das-btn"),
-      ruBtn=document.getElementById("ru-btn");
-
-/* ========================== 4. Events ============================= */
-derBtn.addEventListener("click",()=>check("der"));
-dieBtn.addEventListener("click",()=>check("die"));
-dasBtn.addEventListener("click",()=>check("das"));
-["mousedown","touchstart"].forEach(ev=>ruBtn.addEventListener(ev,showRu));
-["mouseup","mouseleave","touchend","touchcancel"].forEach(ev=>ruBtn.addEventListener(ev,hideRu));
-window.addEventListener("DOMContentLoaded",init);
-
-/* ========================== 5. Logic ============================== */
-function init(){
-  loadStats();
-  updateStats();
-  nextWord();
-}
-function loadStats(){
-  try{const d=JSON.parse(localStorage.getItem("dddStats")||"null");
-      if(d){totalCorrect=d.totalCorrect||0;history=d.history||[]}}catch{}
-}
-function saveStats(){
-  try{localStorage.setItem("dddStats",JSON.stringify({totalCorrect,history}))}catch{}
-}
-function nextWord(){
-  current=germanNouns[Math.floor(Math.random()*germanNouns.length)];
-  wordEl.textContent=current.w;
-  answered=false;
-  [derBtn,dieBtn,dasBtn].forEach(b=>b.classList.remove("correct","incorrect"));
-  feedbackEl.textContent="";
-}
-function check(a){
-  if(answered)return;
-  answered=true;
-  const ok=a===current.a;
-  document.querySelector(`.${a}-btn`).classList.add(ok?"correct":"incorrect");
-  if(!ok)document.querySelector(`.${current.a}-btn`).classList.add("correct");
-  feedbackEl.textContent=ok?"Richtig!":`Falsch – ${current.a} ${current.w}`;
-  if(ok)totalCorrect++;
-  history.push(ok); if(history.length>50)history.shift();
-  saveStats(); updateStats();
-  setTimeout(nextWord,1500);
-}
-function updateStats(){
-  totalScoreEl.textContent=totalCorrect;
-  const ok=history.filter(Boolean).length,
-        rate=history.length?Math.round(ok/history.length*100):0;
-  successRateEl.textContent=rate;
-  successFillEl.style.width=rate+"%";
-}
-function showRu(e){wordEl.textContent=ru[current.w]||"—";e.preventDefault();}
-function hideRu(){wordEl.textContent=current.w;}
-</script>
+  <script src="manifest.js"></script>
+  <script src="unified-wordlist.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
