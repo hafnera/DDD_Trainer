@@ -1,38 +1,431 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Der Die Das Trainer</title>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orise AI Project Overview</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .header-bg {
+            background-color: #ffffff;
+        }
+        .orise-accent-bg {
+            background-color: #D5EBEE;
+        }
+        .card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid #e5e7eb;
+        }
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .btn-primary {
+            background-color: #000000;
+            color: #ffffff;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .btn-primary:hover {
+            background-color: #333333;
+            transform: scale(1.05);
+        }
+        .modal-backdrop, .detail-modal-backdrop {
+            transition: opacity 0.3s ease-in-out;
+        }
+        .modal-content, .detail-modal-content {
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        }
+        .filter-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .status-filter-btn {
+            background-color: #D5EBEE;
+            color: #1f2937; 
+        }
+        .category-filter-btn {
+             background-color: #ffffff;
+             border: 1px solid #d1d5db;
+        }
+        .filter-btn.active {
+            background-color: #000000 !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .tag {
+            display: inline-block;
+            padding: 0.25rem 0.6rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .tag-business {
+            background-color: #D5EBEE;
+            color: #1e3a8a;
+        }
+        .tag-tech {
+            background-color: #e5e7eb;
+            color: #374151;
+        }
+    </style>
 </head>
-<body>
-  <div class="word-display">
-    <div class="word" id="word">—</div>
-    <div class="translation" id="translation">—</div>
-    <button class="ru-btn" id="ru-btn">RU</button>
-  </div>
+<body class="bg-gray-50">
 
-  <div class="success-bar"><div class="success-fill" id="success-fill"></div></div>
-  <div class="success-text">Erfolgsquote: <span id="success-rate">0</span>%</div>
+    <div id="loader" class="flex justify-center items-center h-screen">
+        <div class="animate-spin rounded-full h-32 w-32 border-t-4 border-b-4 border-black"></div>
+    </div>
 
-  <div class="article-buttons">
-    <button class="article-btn der-btn" id="der-btn">der</button>
-    <button class="article-btn die-btn" id="die-btn">die</button>
-    <button class="article-btn das-btn" id="das-btn">das</button>
-  </div>
+    <div id="app-container" class="hidden">
+        <!-- Header -->
+        <header class="header-bg text-black shadow-sm sticky top-0 z-40">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-20">
+                    <div class="flex items-center space-x-4">
+                        <img src="https://orise.com/wp-content/themes/ats-orise/img/OriseLogo.svg" alt="Orise Logo" class="h-8">
+                        <h1 class="text-2xl font-extrabold text-gray-800 tracking-tight">AI Hub</h1>
+                    </div>
+                     <div class="text-sm font-medium text-gray-500">Last Updated: <span id="lastUpdated"></span></div>
+                </div>
+            </div>
+        </header>
 
-  <div class="feedback" id="feedback"></div>
+        <!-- Main Content -->
+        <main>
+            <div class="orise-accent-bg">
+                <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
+                    <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">Innovate with Intelligence</h2>
+                    <p class="text-lg text-gray-700 max-w-3xl mx-auto">Discover AI projects, get expert support, and contribute your ideas to drive the future of technology at Orise.</p>
+                </div>
+            </div>
 
-  <div class="score-box">
-    <div class="score-label">Gesamtpunktzahl</div>
-    <div class="score-value" id="total-score">0</div>
-  </div>
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 -mt-10">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+                    <a id="contact-support-link" href="#" class="bg-white p-6 rounded-xl shadow-lg text-center border hover:shadow-2xl transition-shadow duration-300 block">
+                        <i class="fas fa-headset text-4xl mb-4 text-black"></i>
+                        <h3 class="text-xl font-bold mb-2">Get Support</h3>
+                        <p class="text-gray-600 mb-4">Questions about AI tech or data security? Our experts are here to help.</p>
+                        <span class="font-bold text-black hover:underline">Contact Experts &rarr;</span>
+                    </a>
+                    <a id="request-solution-link" href="#" class="bg-white p-6 rounded-xl shadow-lg text-center border hover:shadow-2xl transition-shadow duration-300 block">
+                        <i class="fas fa-tasks text-4xl mb-4 text-black"></i>
+                        <h3 class="text-xl font-bold mb-2">Request a Solution</h3>
+                        <p class="text-gray-600 mb-4">Have a business challenge? Let's build an AI solution together.</p>
+                        <span class="font-bold text-black hover:underline">Make a Request &rarr;</span>
+                    </a>
+                    <div class="bg-white p-6 rounded-xl shadow-lg text-center border hover:shadow-2xl transition-shadow duration-300">
+                        <i class="fas fa-lightbulb text-4xl mb-4 text-black"></i>
+                        <h3 class="text-xl font-bold mb-2">Submit an Idea</h3>
+                        <p class="text-gray-600 mb-4">Your next big idea could be our next big project. Share it now.</p>
+                        <button onclick="toggleIdeaModal(true)" class="font-bold text-black hover:underline">Share Your Idea &darr;</button>
+                    </div>
+                </div>
 
+                <!-- Projects Section -->
+                <div class="mb-12">
+                    <h3 class="text-3xl font-extrabold text-gray-900 mb-8 text-center tracking-tight">Explore AI Initiatives</h3>
+                    <div id="status-filters-container" class="flex justify-center gap-4 mb-8"></div>
+                    <div id="category-filters-container" class="flex flex-wrap justify-center gap-2 mb-8"></div>
+                    <div id="projects-container"></div>
+                </div>
+            </div>
+        </main>
 
+        <footer class="bg-white mt-16 border-t">
+            <div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8 text-center text-gray-500">&copy; 2025 Orise. All Rights Reserved.</div>
+        </footer>
+    </div>
 
-  <script src="manifest.js"></script>
-  <script src="unified-wordlist.js"></script>
-  <script src="app.js"></script>
+    <!-- Idea Submission Modal -->
+    <div id="idea-modal" class="fixed inset-0 z-50 hidden items-center justify-center">
+        <div class="modal-backdrop fixed inset-0 bg-black bg-opacity-50" onclick="toggleIdeaModal(false)"></div>
+        <div class="modal-content bg-white rounded-xl shadow-2xl w-full max-w-lg m-4 p-8 relative transform opacity-0 scale-95">
+            <button onclick="toggleIdeaModal(false)" class="absolute top-4 right-4 text-gray-400 hover:text-black"><i class="fas fa-times text-2xl"></i></button>
+            <h3 class="text-2xl font-bold text-gray-800 mb-4">Submit Your AI Idea</h3>
+            <p class="text-gray-600 mb-6">Help us innovate by sharing your vision. Fill out the form below.</p>
+            <div id="form-confirmation" class="hidden bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-lg mb-6" role="alert">
+                <p class="font-bold">Thank you!</p><p>Your idea has been submitted successfully.</p>
+            </div>
+            <form id="idea-form">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <input type="text" placeholder="Your Name" class="p-3 border-gray-300 border rounded-md w-full focus:ring-2 focus:ring-black focus:border-black" required>
+                    <input type="text" placeholder="Your Division" class="p-3 border-gray-300 border rounded-md w-full focus:ring-2 focus:ring-black focus:border-black" required>
+                </div>
+                <div class="mb-4"><input type="text" placeholder="Idea Title (e.g., 'AI for automating reports')" class="p-3 border-gray-300 border rounded-md w-full focus:ring-2 focus:ring-black focus:border-black" required></div>
+                <div class="mb-6"><textarea placeholder="Describe your idea, the problem it solves, and its potential impact..." rows="5" class="p-3 border-gray-300 border rounded-md w-full focus:ring-2 focus:ring-black focus:border-black" required></textarea></div>
+                <div class="text-right"><button type="submit" class="btn-primary font-bold py-3 px-8 rounded-lg">Submit Idea</button></div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Project Detail Modal -->
+    <div id="detail-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div class="detail-modal-backdrop fixed inset-0 bg-black bg-opacity-75" onclick="toggleDetailModal(false)"></div>
+        <div class="detail-modal-content bg-gray-50 rounded-xl shadow-2xl w-full max-w-6xl h-full max-h-[90vh] m-4 relative transform opacity-0 scale-95 flex flex-col">
+            <div class="p-8 flex-grow overflow-y-auto">
+                <div id="project-detail-content"></div>
+            </div>
+            <button onclick="toggleDetailModal(false)" class="absolute top-4 right-4 text-gray-400 hover:text-black bg-white rounded-full w-10 h-10 flex items-center justify-center shadow-lg">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA ---
+        const randomNames = [
+            { first: 'Lukas', last: 'Schmidt' }, { first: 'Hanna', last: 'Weber' }, { first: 'Felix', last: 'Müller' },
+            { first: 'Sophia', last: 'Bauer' }, { first: 'Jan', last: 'Richter' }, { first: 'Lena', last: 'Klein' }
+        ];
+
+        const getRandomPerson = () => {
+            const person = randomNames[Math.floor(Math.random() * randomNames.length)];
+            return { name: `${person.first} ${person.last}`, email: `${person.first.toLowerCase()}.${person.last.toLowerCase()}@orise.com` };
+        };
+
+        const projects = [
+            { id: 'doc-info-extraction', status: 'Finished', title: 'Document Information Extraction', icon: 'fa-file-invoice-dollar', businessCategory: 'Operations', technicalCategories: ['Data Extraction', 'NLP'], description: 'This project focuses on developing a robust AI tool (AA tool) capable of automatically extracting key information from various document types like invoices, purchase orders, and contracts.', tech_stack: [{ name: 'Azure OpenAI API', icon: 'fa-brands fa-windows' }, { name: 'Python', icon: 'fa-brands fa-python' }] },
+            { id: 'helpdesk-chatbot', status: 'Ongoing', title: '1st Level Helpdesk Chatbot', icon: 'fa-headset', businessCategory: 'IT Support', technicalCategories: ['Chatbots', 'Generative AI'], description: 'The First Level Helpdesk Chatbot aims to provide immediate, 24/7 support for common IT issues directly within Microsoft Teams.', tech_stack: [{ name: 'Microsoft Bot Framework', icon: 'fa-brands fa-microsoft' }, { name: 'Azure Cognitive Services', icon: 'fa-brain' }] },
+            { id: 'project-insights-chatbot', status: 'Ongoing', title: 'Project Insights Chatbot', icon: 'fa-chart-line', businessCategory: 'Project Management', technicalCategories: ['Chatbots', 'Data Analytics'], description: 'This chatbot provides project managers and stakeholders with instant access to project data through a simple conversational interface in MS Teams.', tech_stack: [{ name: 'Locally Hosted Open Source LLM', icon: 'fa-server' }, { name: 'LangChain & Vector DB', icon: 'fa-link' }] },
+            { id: 'technical-specs', status: 'Ongoing', title: 'Create Technical Specifications', icon: 'fa-file-signature', businessCategory: 'Sales & Proposals', technicalCategories: ['Generative AI', 'NLP'], description: 'This initiative leverages AI to help engineers and sales teams generate accurate and comprehensive technical specification documents more efficiently.', tech_stack: [{ name: 'Fine-tuned GPT Model', icon: 'fa-cogs' }] },
+            { id: 'proposal-creation', status: 'Finished', title: 'Proposal Creation', icon: 'fa-file-alt', businessCategory: 'Sales & Proposals', technicalCategories: ['Generative AI'], description: 'An AI-assisted tool to streamline the creation of business proposals, ensuring consistency and accuracy while saving time.', tech_stack: [{ name: 'Generative AI (GPT-4)', icon: 'fa-robot' }] },
+            { id: 'bid-approval', status: 'Ongoing', title: 'Bid Approval Workflow', icon: 'fa-gavel', businessCategory: 'Sales & Proposals', technicalCategories: ['RPA'], description: 'Automates the bid approval process, including Covat analysis, cost calculation, and document filling, to accelerate sales cycles.', tech_stack: [{ name: 'RPA (Robotic Process Automation)', icon: 'fa-gears' }] },
+            { id: 'legal-contract-analysis', status: 'Finished', title: 'Document & Legal Contract Analysis', icon: 'fa-balance-scale', businessCategory: 'Legal & Compliance', technicalCategories: ['NLP', 'Data Extraction'], description: 'Focuses on AI-powered legal contract analysis to identify risks, key clauses, and obligations, supporting our legal team.', tech_stack: [{ name: 'Natural Language Processing (NLP)', icon: 'fa-language' }] },
+            { id: 'meeting-minutes', status: 'Ongoing', title: 'Automated Meeting Minutes', icon: 'fa-microphone-alt', businessCategory: 'Project Management', technicalCategories: ['Speech-to-Text', 'NLP'], description: 'A tool that transcribes meetings, identifies action items, and generates concise minutes automatically.', tech_stack: [{ name: 'Speech-to-Text API', icon: 'fa-volume-high' }] },
+            { id: 'rfq-analysis', status: 'Finished', title: 'Evaluating Technical Information (RFQ)', icon: 'fa-search-dollar', businessCategory: 'Operations', technicalCategories: ['Data Extraction'], description: 'AI-driven analysis of Request for Quotation (RFQ) documents to quickly extract technical requirements and evaluate feasibility.', tech_stack: [{ name: 'Information Extraction Models', icon: 'fa-microchip' }] },
+            { id: 'coe-support', status: 'Ongoing', title: 'COE Operation (1st Level Support)', icon: 'fa-life-ring', businessCategory: 'IT Support', technicalCategories: ['Chatbots'], description: 'Provides intelligent 1st level support for the Center of Excellence, answering common queries and routing complex issues.', tech_stack: [{ name: 'Knowledge Base Chatbot', icon: 'fa-book' }] },
+            { id: 'functional-design', status: 'Ongoing', title: 'Functional Design Assistant', icon: 'fa-drafting-compass', businessCategory: 'Operations', technicalCategories: ['Recommender Systems'], description: 'Assists in creating functional design specifications by leveraging past project data and customer requirements to ensure needs are met.', tech_stack: [{ name: 'Recommender Systems', icon: 'fa-lightbulb' }] },
+            { id: 'onboarding-recruiting', status: 'Finished', title: 'Onboarding & Recruiting Automation', icon: 'fa-user-plus', businessCategory: 'HR & Recruiting', technicalCategories: ['RPA', 'NLP'], description: 'Streamlines the onboarding and recruiting process with AI, from resume screening to scheduling interviews and preparing onboarding materials.', tech_stack: [{ name: 'HR Automation Tools', icon: 'fa-users-cog' }] }
+        ].map(p => ({ ...p, lead: getRandomPerson(), contacts: [getRandomPerson(), getRandomPerson()] }));
+
+        const supportContact = getRandomPerson();
+        const requestContact = getRandomPerson();
+        let currentStatusFilter = 'All';
+        let currentCategoryFilter = 'All';
+
+        // --- FUNCTIONS ---
+        function createProjectCard(project) {
+            const cardBgClass = project.status === 'Finished' ? 'bg-white' : 'bg-white';
+            return `
+                <div class="card ${cardBgClass} rounded-xl p-6 text-left cursor-pointer flex flex-col" onclick="showProjectDetail('${project.id}')">
+                    <div class="flex-grow">
+                        <div class="flex items-start mb-4">
+                            <div class="orise-accent-bg w-12 h-12 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
+                                <i class="fas ${project.icon} text-black text-2xl"></i>
+                            </div>
+                            <h4 class="font-bold text-lg text-gray-800 flex-1">${project.title}</h4>
+                        </div>
+                        <p class="text-sm text-gray-500 mb-3">Lead: ${project.lead.name}</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="tag tag-business">${project.businessCategory}</span>
+                            ${project.technicalCategories.map(cat => `<span class="tag tag-tech">${cat}</span>`).join('')}
+                        </div>
+                    </div>
+                    <div class="text-right mt-4 pt-4 border-t border-gray-100">
+                        <span class="text-black font-semibold text-sm hover:underline">View Details &rarr;</span>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function renderProjects() {
+            const container = document.getElementById('projects-container');
+            container.innerHTML = '';
+            
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`.status-filter-btn[data-filter="${currentStatusFilter}"]`).classList.add('active');
+            document.querySelector(`.category-filter-btn[data-filter="${currentCategoryFilter}"]`).classList.add('active');
+
+            let projectsToRender = projects;
+            if (currentStatusFilter !== 'All') {
+                 projectsToRender = projects.filter(p => p.status === currentStatusFilter);
+            }
+
+            if(currentCategoryFilter !== 'All') {
+                projectsToRender = projectsToRender.filter(p => p.businessCategory === currentCategoryFilter || p.technicalCategories.includes(currentCategoryFilter));
+            }
+
+            if (projectsToRender.length === 0) {
+                container.innerHTML = `<p class="text-center text-gray-500 col-span-full py-10">No projects match the selected filters.</p>`;
+                return;
+            }
+
+            if (currentCategoryFilter === 'All') {
+                const businessCategories = [...new Set(projectsToRender.map(p => p.businessCategory))].sort();
+                businessCategories.forEach(category => {
+                    const categoryWrapper = document.createElement('div');
+                    categoryWrapper.innerHTML = `<h3 class="text-2xl font-bold text-gray-800 mt-8 mb-4 pb-2 border-b-2 border-gray-200">${category}</h3>`;
+                    const projectsInCategory = projectsToRender.filter(p => p.businessCategory === category);
+                    const grid = document.createElement('div');
+                    grid.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8';
+                    grid.innerHTML = projectsInCategory.map(createProjectCard).join('');
+                    categoryWrapper.appendChild(grid);
+                    container.appendChild(categoryWrapper);
+                });
+            } else {
+                const grid = document.createElement('div');
+                grid.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8';
+                grid.innerHTML = projectsToRender.map(createProjectCard).join('');
+                container.appendChild(grid);
+            }
+        }
+
+        function renderFilters() {
+            const statusContainer = document.getElementById('status-filters-container');
+            const categoryContainer = document.getElementById('category-filters-container');
+            
+            statusContainer.innerHTML = ['All', 'Ongoing', 'Finished'].map(filter => 
+                `<button class="filter-btn status-filter-btn font-extrabold py-3 px-8 rounded-lg" data-filter="${filter}" onclick="setStatusFilter('${filter}')">${filter === 'All' ? 'All Solutions' : filter}</button>`
+            ).join('');
+
+            let activeProjects = projects;
+            if(currentStatusFilter !== 'All') {
+                activeProjects = projects.filter(p => p.status === currentStatusFilter);
+            }
+            
+            const businessCategories = ['All', ...[...new Set(activeProjects.map(p => p.businessCategory))].sort()];
+            const techCategories = [...new Set(activeProjects.flatMap(p => p.technicalCategories))].sort();
+            
+            const allCategories = [...businessCategories, ...techCategories];
+            categoryContainer.innerHTML = allCategories.map(filter => 
+                `<button class="filter-btn category-filter-btn font-semibold py-2 px-4 rounded-full" data-filter="${filter}" onclick="setCategoryFilter('${filter}')">${filter}</button>`
+            ).join('');
+        }
+        
+        function setStatusFilter(status) {
+            currentStatusFilter = status;
+            currentCategoryFilter = 'All';
+            renderFilters();
+            renderProjects();
+        }
+
+        function setCategoryFilter(category) {
+            currentCategoryFilter = category;
+            renderProjects();
+        }
+
+        function showProjectDetail(projectId) {
+            const project = projects.find(p => p.id === projectId);
+            if (!project) return;
+            const detailContent = document.getElementById('project-detail-content');
+            
+            let actionButton = '';
+            if(project.status === 'Finished') {
+                actionButton = `<a href="mailto:${project.lead.email}?subject=Request Access: ${project.title}" class="btn-primary font-bold py-3 px-8 rounded-lg inline-block mt-6">Request Access to Solution</a>`;
+            }
+
+            detailContent.innerHTML = `
+                <div class="flex flex-col md:flex-row items-start mb-8">
+                    <div class="flex-shrink-0 mb-6 md:mb-0 md:mr-8"><div class="orise-accent-bg w-24 h-24 rounded-xl flex items-center justify-center"><i class="fas ${project.icon} text-5xl text-black"></i></div></div>
+                    <div class="flex-1">
+                        <h2 class="text-4xl font-extrabold text-gray-900 tracking-tight">${project.title}</h2>
+                        <p class="text-xl text-gray-500 mt-2">Lead by ${project.lead.name}</p>
+                        <div class="flex flex-wrap gap-2 mt-4">
+                            <span class="tag tag-business">${project.businessCategory}</span>
+                            ${project.technicalCategories.map(cat => `<span class="tag tag-tech">${cat}</span>`).join('')}
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-10">
+                    <h3 class="text-2xl font-bold text-gray-800 border-b-2 border-gray-200 pb-3 mb-4">Project Description</h3>
+                    <p class="text-gray-700 leading-relaxed text-lg">${project.description}</p>
+                    ${actionButton}
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-800 border-b-2 border-gray-200 pb-3 mb-4">Contacts</h3>
+                        <ul class="space-y-4">
+                            ${[project.lead, ...project.contacts].slice(0, 3).map((contact, index) => `
+                                <li class="flex items-center"><div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mr-4"><i class="fas fa-user text-black"></i></div><div><p class="text-md font-medium text-gray-900">${contact.name}</p><p class="text-sm text-gray-500">${index === 0 ? 'Project Lead' : 'Stakeholder'} | <a href="mailto:${contact.email}" class="text-black hover:underline">${contact.email}</a></p></div></li>`).join('')}
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-800 border-b-2 border-gray-200 pb-3 mb-4">Technology Stack</h3>
+                        <ul class="space-y-4">
+                             ${project.tech_stack.map(tech => `<li class="flex items-start"><div class="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center mr-4"><i class="fas ${tech.icon} text-gray-600 text-2xl"></i></div><p class="text-md font-medium text-gray-900 self-center">${tech.name}</p></li>`).join('')}
+                        </ul>
+                    </div>
+                </div>`;
+            toggleDetailModal(true);
+        }
+
+        function toggleIdeaModal(show) {
+            const modal = document.getElementById('idea-modal');
+            const backdrop = modal.querySelector('.modal-backdrop');
+            const content = modal.querySelector('.modal-content');
+            if (show) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                setTimeout(() => {
+                    backdrop.classList.add('opacity-100');
+                    content.classList.add('opacity-100', 'scale-100');
+                }, 10);
+            } else {
+                backdrop.classList.remove('opacity-100');
+                content.classList.remove('opacity-100', 'scale-100');
+                content.classList.add('opacity-0', 'scale-95');
+                setTimeout(() => modal.classList.add('hidden'), 300);
+            }
+        }
+        
+        function toggleDetailModal(show) {
+            const modal = document.getElementById('detail-modal');
+            const backdrop = modal.querySelector('.detail-modal-backdrop');
+            const content = modal.querySelector('.detail-modal-content');
+            if (show) {
+                document.body.style.overflow = 'hidden';
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                setTimeout(() => {
+                    backdrop.classList.add('opacity-100');
+                    content.classList.add('opacity-100', 'scale-100');
+                }, 10);
+            } else {
+                document.body.style.overflow = '';
+                backdrop.classList.remove('opacity-100');
+                content.classList.remove('opacity-100', 'scale-100');
+                content.classList.add('opacity-0', 'scale-95');
+                setTimeout(() => modal.classList.add('hidden'), 300);
+            }
+        }
+
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            const form = document.getElementById('idea-form');
+            const confirmation = document.getElementById('form-confirmation');
+            form.style.display = 'none';
+            confirmation.style.display = 'block';
+            setTimeout(() => {
+                toggleIdeaModal(false);
+                setTimeout(() => {
+                    form.reset();
+                    form.style.display = 'block';
+                    confirmation.style.display = 'none';
+                }, 500);
+            }, 3000);
+        }
+
+        // --- INITIALIZATION ---
+        window.onload = function() {
+            setTimeout(() => {
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('app-container').classList.remove('hidden');
+
+                document.getElementById('lastUpdated').textContent = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+                document.getElementById('idea-form').addEventListener('submit', handleFormSubmit);
+
+                document.getElementById('contact-support-link').href = `mailto:${supportContact.email}?subject=AI Project Support`;
+                document.getElementById('request-solution-link').href = `mailto:${requestContact.email}?subject=AI Solution Request`;
+                
+                renderFilters();
+                renderProjects();
+
+            }, 500);
+        };
+    </script>
 </body>
 </html>
